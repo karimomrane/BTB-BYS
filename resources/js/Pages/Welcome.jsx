@@ -1,9 +1,22 @@
+import { useState, useEffect } from "react";
 import ApplicationLogo from "@/Components/ApplicationLogo";
 import { Head, Link } from "@inertiajs/react";
 import { FaFacebook, FaInstagram } from "react-icons/fa";
 import { motion } from "framer-motion";
 
 export default function Welcome({ auth, laravelVersion, phpVersion }) {
+    const [isAnimating, setIsAnimating] = useState(true);
+
+    useEffect(() => {
+        // Set overflow hidden during animation
+        document.body.style.overflow = isAnimating ? "hidden" : "hidden";
+
+        // Reset the body overflow after the animation
+        if (!isAnimating) {
+            document.body.style.overflow = "hidden";
+        }
+    }, [isAnimating]);
+
     const handleImageError = () => {
         document.getElementById("screenshot-container")?.classList.add("!hidden");
         document.getElementById("docs-card")?.classList.add("!row-span-1");
@@ -18,6 +31,7 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
             transition={{ duration: 1 }}
             className="h-screen flex flex-col justify-between bg-cover bg-center"
             style={{ backgroundImage: "url(bgg.png)" }}
+            onAnimationComplete={() => setIsAnimating(false)} // When the animation ends
         >
             {/* Nav */}
             <motion.div
