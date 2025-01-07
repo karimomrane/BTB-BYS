@@ -15,15 +15,14 @@ class HomeController extends Controller
         if(Auth::user()->role == 'admin') {
             $commandes = Commande::count();
             $users = User::count();
+            $uc = User::withCount('commandes')->where('role', '!=', 'admin')->get();
             return Inertia::render('Dashboard', [
                 'commandes' => $commandes,
-                'users' => $users
+                'users' => $users,
+                'uc' => $uc
             ]);
         }else {
-            $commandes = Commande::where('user_id', Auth::user()->id)->count();
-            return Inertia::render('Dashboard', [
-                'commandes' => $commandes
-            ]);
+            return to_route('commandes.index');
         }
     }
 }

@@ -14,9 +14,11 @@ class CommandeController extends Controller
      */
     public function index()
     {
-        // Retrieve all commandes from the database
-        $commandes = Commande::with('user')->get();
-
+        if(Auth::user()->role == 'admin') {
+            $commandes = Commande::with('user')->get();
+        }else {
+            $commandes = Commande::with('user')->where('user_id', Auth::user()->id)->get();
+        }
         // Pass the commandes data to the Inertia view
         return Inertia::render('Commande/Index', [
             'commandes' => $commandes,

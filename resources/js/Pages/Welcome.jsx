@@ -15,7 +15,7 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
     };
 
     return (
-        <div className="h-screen pb-14 bg-right bg-cover" style={{ backgroundImage: 'url(bg.svg)' }}>
+        <div className="h-screen pb-14 bg-right bg-cover" style={{ backgroundImage: 'url(bb.jpg)', backgroundSize: 'cover' }}>
             {/* Nav */}
             <div className="w-full container mx-auto p-6">
                 <div className="w-full flex items-center justify-between">
@@ -28,13 +28,13 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
 
                     <div className="flex w-1/2 justify-end content-center">
                         <a
-                            className="inline-block text-green-500 no-underline hover:text-green-800 hover:text-underline text-center h-10 p-2 md:h-auto md:p-4"
+                            className="inline-block text-white no-underline hover:text-green-800 hover:text-underline text-center h-10 p-2 md:h-auto md:p-4"
                             href="https://twitter.com/intent/tweet?url=#"
                         >
                             <FaFacebook />
                         </a>
                         <a
-                            className="inline-block text-green-500 no-underline hover:text-green-800 hover:text-underline text-center h-10 p-2 md:h-auto md:p-4"
+                            className="inline-block text-white no-underline hover:text-green-800 hover:text-underline text-center h-10 p-2 md:h-auto md:p-4"
                             href="https://www.facebook.com/sharer/sharer.php?u=#"
                         >
                             <FaInstagram />
@@ -44,24 +44,23 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
             </div>
 
             {/* Main */}
-            <div className="container mx-auto flex flex-wrap flex-col md:flex-row items-center">
+            <div className="container mt-10 mx-auto flex flex-wrap flex-col md:flex-row items-center">
                 {/* Left Col */}
                 <div className="flex flex-col w-full xl:w-2/5 justify-center lg:items-start overflow-y-hidden">
-                    <h1 className="my-4 text-3xl md:text-3xl text-green-800 font-bold leading-tight text-center md:text-left slide-in-bottom-h1">
+                    <h1 className="my-4 text-3xl md:text-3xl text-white font-bold leading-tight text-center md:text-left slide-in-bottom-h1">
                         BTB By Ben Yaghlane Shops
                     </h1>
-                    <p className="leading-normal text-base md:text-2xl mb-8 text-center md:text-left slide-in-bottom-subtitle">
+                    <p className="text-gray-100 leading-normal text-base md:text-2xl mb-8 text-center md:text-left slide-in-bottom-subtitle">
                     BTB by Ben Yaghlane Shops is your one-stop solution for all your shopping needs
                     </p>
 
-                    <p className="text-green-400  font-bold pb-8 lg:pb-6 text-center md:text-left fade-in">
+                    <p className="text-white font-bold pb-8 lg:pb-6 text-center md:text-left fade-in">
                         {/* Login/Register */}
                         {auth?.user ? (
                             <Link
-                                to="/dashboard"
-                                className="border"
-                            >
-                                Dashboard
+                                href={route('commandes.create')}
+                                className="border p-4 rounded-full hover:text-white hover:bg-green-400"                                >
+                                Passer une commande
                             </Link>
                         ) : (
                             <>
@@ -81,12 +80,11 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
 
                 {/* Right Col */}
                 <div className="w-full xl:w-3/5 py-6 overflow-y-hidden">
-                    <img className="w-5/6 mx-auto lg:mr-0 slide-in-bottom" src="/devices.svg" alt="Devices" />
                 </div>
 
                 {/* Footer */}
-                <div className="w-full pt-16 pb-6 text-sm text-center md:text-left fade-in">
-                    <a className="text-gray-500 no-underline hover:no-underline" href="#">
+                <div className="w-full pt-32 pb-6 text-sm text-center md:text-left fade-in">
+                    <a className="text-gray-200 no-underline hover:no-underline" href="#">
                         CopyRight ♠ Karim Omrane 2025
                     </a>
                 </div>
