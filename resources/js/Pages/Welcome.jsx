@@ -15,82 +15,71 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
     };
 
     return (
-        <div className="h-screen pb-14 bg-right bg-cover" style={{ backgroundImage: 'url(bb.jpg)', backgroundSize: 'cover' }}>
+        <div
+            className="h-screen flex flex-col justify-between bg-cover bg-center"
+            style={{ backgroundImage: 'url(bb.jpg)' }}
+        >
             {/* Nav */}
-            <div className="w-full container mx-auto p-6">
-                <div className="w-full flex items-center justify-between">
+            <div className="w-full container mx-auto p-4 flex items-center justify-between">
+                <a
+                    className="flex items-center text-indigo-400 no-underline hover:no-underline font-bold text-2xl lg:text-4xl"
+                    href="#"
+                >
+                    <ApplicationLogo width={80} height={80} />
+                </a>
+                <div className="flex space-x-4">
                     <a
-                        className="flex items-center text-indigo-400 no-underline hover:no-underline font-bold text-2xl lg:text-4xl"
-                        href="#"
+                        className="text-white hover:text-green-400 text-xl"
+                        href="https://www.facebook.com/benyaghlane.shops"
                     >
-                        <ApplicationLogo width={100} height={100} />
+                        <FaFacebook />
                     </a>
-
-                    <div className="flex w-1/2 justify-end content-center">
-                        <a
-                            className="inline-block text-white no-underline hover:text-green-800 hover:text-underline text-center h-10 p-2 md:h-auto md:p-4"
-                            href="https://www.facebook.com/benyaghlane.shops"
-                        >
-                            <FaFacebook />
-                        </a>
-                        <a
-                            className="inline-block text-white no-underline hover:text-green-800 hover:text-underline text-center h-10 p-2 md:h-auto md:p-4"
-                            href="https://www.instagram.com/benyaghlaneshops/"
-                        >
-                            <FaInstagram />
-                        </a>
-                    </div>
+                    <a
+                        className="text-white hover:text-green-400 text-xl"
+                        href="https://www.instagram.com/benyaghlaneshops/"
+                    >
+                        <FaInstagram />
+                    </a>
                 </div>
             </div>
 
             {/* Main */}
-            <div className="container mt-10 mx-auto flex flex-wrap flex-col md:flex-row items-center">
+            <div className="container mx-auto flex flex-wrap items-center px-6 lg:px-20">
                 {/* Left Col */}
-                <div className="flex flex-col w-full xl:w-2/5 justify-center lg:items-start overflow-y-hidden">
-                    <h1 className="my-4 text-3xl md:text-3xl text-white font-bold leading-tight text-center md:text-left slide-in-bottom-h1">
+                <div className="w-full lg:w-1/2 mb-12 lg:mb-0 text-center lg:text-left">
+                    <h1 className="text-4xl md:text-5xl text-white font-bold leading-tight mb-6">
                         BTB By Ben Yaghlane Shops
                     </h1>
-                    <p className="text-gray-100 leading-normal text-base md:text-2xl mb-8 text-center md:text-left slide-in-bottom-subtitle">
-                    BTB by Ben Yaghlane Shops is your one-stop solution for all your shopping needs
+                    <p className="text-gray-100 text-lg md:text-xl mb-6">
+                        BTB by Ben Yaghlane Shops is your one-stop solution for all your shopping needs.
                     </p>
-
-                    <p className="text-white font-bold pb-8 lg:pb-6 text-center md:text-left fade-in">
-                        {/* Login/Register */}
+                    <div>
                         {auth?.user ? (
                             <Link
                                 href={route('commandes.create')}
-                                className="border p-4 rounded-full hover:text-white hover:bg-green-400"                                >
+                                className="px-6 py-3 bg-green-500 text-white rounded-full shadow hover:bg-green-600 transition"
+                            >
                                 Passer une commande
                             </Link>
                         ) : (
-                            <>
-                                <Link
-                                    href={route('login')}
-                                    className="border p-4 rounded-full hover:text-white hover:bg-green-400"
-                                >
-                                    Se Connecter
-                                </Link>
-                            </>
+                            <Link
+                                href={route('login')}
+                                className="px-6 py-3 bg-blue-500 text-white rounded-full shadow hover:bg-blue-600 transition"
+                            >
+                                Se Connecter
+                            </Link>
                         )}
-                    </p>
-                    <div className="flex w-full justify-center md:justify-start pb-24 lg:pb-0 fade-in">
-
                     </div>
                 </div>
 
-                {/* Right Col */}
-                <div className="w-full xl:w-3/5 py-6 overflow-y-hidden">
-                </div>
-
-                {/* Footer */}
-                <div className="w-full pt-32 pb-6 text-sm text-center md:text-left fade-in">
-                    <a className="text-gray-200 no-underline hover:no-underline" href="#">
-                        CopyRight ♠ Karim Omrane 2025
-                    </a>
-                </div>
             </div>
 
-
+            {/* Footer */}
+            <footer className="w-full bg-gray-200 bg-opacity-0 py-4 text-center text-white text-sm">
+                <p>
+                    © 2025 <a href="#" className="hover:text-white">Karim Omrane</a>. All Rights Reserved.
+                </p>
+            </footer>
         </div>
     );
 }

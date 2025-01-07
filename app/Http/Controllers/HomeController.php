@@ -15,14 +15,16 @@ class HomeController extends Controller
         if(Auth::user()->role == 'admin') {
             $commandes = Commande::count();
             $users = User::count();
+            $comliv = Commande::where('status', 'Livré')->count();
             $uc = User::withCount('commandes')->where('role', '!=', 'admin')->get();
             return Inertia::render('Dashboard', [
                 'commandes' => $commandes,
+                'comliv' => $comliv,
                 'users' => $users,
                 'uc' => $uc
             ]);
         }else {
-            return to_route('commandes.index');
+            return to_route('commandes.create');
         }
     }
 }

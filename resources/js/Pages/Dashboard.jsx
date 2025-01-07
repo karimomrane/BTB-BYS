@@ -1,8 +1,8 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, usePage } from '@inertiajs/react';
-import { FaUsers, FaClipboardList } from 'react-icons/fa'; // Importing icons from react-icons
+import { FaUsers, FaClipboardList, FaCheck, FaTruck } from 'react-icons/fa';
 
-export default function Dashboard({ uc, users, commandes }) {
+export default function Dashboard({comliv, uc, users, commandes }) {
     const user = usePage().props.auth.user;
 
     return (
@@ -16,14 +16,17 @@ export default function Dashboard({ uc, users, commandes }) {
             <Head title="Dashboard" />
 
             {/* Stats Cards */}
-            <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 p-10">
+            <div className="grid gap-6 p-6 sm:grid-cols-2 lg:grid-cols-3">
                 {user.role === 'admin' && (
-                    <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md flex items-center">
-                        <div className="mr-4">
-                            <FaUsers className="text-3xl text-blue-500 dark:text-blue-400" />
+                    <div className="flex items-center rounded-lg bg-white p-6 shadow-lg dark:bg-gray-800">
+                        <div className="mr-4 flex items-center justify-center h-12 w-12 rounded-full bg-blue-100 dark:bg-blue-900">
+                            <FaUsers
+                                className="text-blue-500 dark:text-blue-400"
+                                aria-label="Users Icon"
+                            />
                         </div>
                         <div>
-                            <h3 className="text-xl font-semibold leading-tight text-gray-800 dark:text-gray-200">
+                            <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200">
                                 Utilisateurs
                             </h3>
                             <p className="text-gray-600 dark:text-gray-400">
@@ -33,12 +36,15 @@ export default function Dashboard({ uc, users, commandes }) {
                     </div>
                 )}
 
-                <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md flex items-center">
-                    <div className="mr-4">
-                        <FaClipboardList className="text-3xl text-green-500 dark:text-green-400" />
+                <div className="flex items-center rounded-lg bg-white p-6 shadow-lg dark:bg-gray-800">
+                    <div className="mr-4 flex items-center justify-center h-12 w-12 rounded-full bg-orange-100 dark:bg-orange-900">
+                        <FaClipboardList
+                            className="text-orange-500 dark:text-orange-400"
+                            aria-label="Orders Icon"
+                        />
                     </div>
                     <div>
-                        <h3 className="text-xl font-semibold leading-tight text-gray-800 dark:text-gray-200">
+                        <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200">
                             Commandes
                         </h3>
                         <p className="text-gray-600 dark:text-gray-400">
@@ -46,52 +52,73 @@ export default function Dashboard({ uc, users, commandes }) {
                         </p>
                     </div>
                 </div>
+                <div className="flex items-center rounded-lg bg-white p-6 shadow-lg dark:bg-gray-800">
+                    <div className="mr-4 flex items-center justify-center h-12 w-12 rounded-full bg-green-100 dark:bg-green-900">
+                        <FaTruck
+                            className="text-green-500 dark:text-green-400"
+                            aria-label="Orders Icon"
+                        />
+                    </div>
+                    <div>
+                        <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200">
+                            Commandes Livré
+                        </h3>
+                        <p className="text-gray-600 dark:text-gray-400">
+                            {comliv ? comliv : 0}
+                        </p>
+                    </div>
+                </div>
             </div>
 
             {/* Ranking Table */}
-            <div className="px-10">
-                <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
-                    <h3 className="text-xl font-semibold leading-tight text-gray-800 dark:text-gray-200 mb-4">
+            <div className="p-6">
+                <div className="rounded-lg bg-white p-6 shadow-lg dark:bg-gray-800">
+                    <h3 className="mb-4 text-lg font-semibold text-gray-800 dark:text-gray-200">
                         Classement des utilisateurs par commandes
                     </h3>
-                    <table className="w-full table-auto border-collapse border border-gray-200 dark:border-gray-700">
-                        <thead>
-                            <tr className="bg-gray-100 dark:bg-gray-700">
-                                <th className="border border-gray-200 dark:border-gray-700 px-4 py-2 text-left text-gray-700 dark:text-gray-300">
-                                    Rang
-                                </th>
-                                <th className="border border-gray-200 dark:border-gray-700 px-4 py-2 text-left text-gray-700 dark:text-gray-300">
-                                    Nom
-                                </th>
-                                <th className="border border-gray-200 dark:border-gray-700 px-4 py-2 text-left text-gray-700 dark:text-gray-300">
-                                    Email
-                                </th>
-                                <th className="border border-gray-200 dark:border-gray-700 px-4 py-2 text-left text-gray-700 dark:text-gray-300">
-                                    Nombre de Commandes
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {uc
-                                .sort((a, b) => b.commandes_count - a.commandes_count)
-                                .map((user, index) => (
-                                    <tr key={user.id} className="hover:bg-gray-100 dark:hover:bg-gray-700">
-                                        <td className="border border-gray-200 dark:border-gray-700 px-4 py-2 text-gray-700 dark:text-gray-300">
-                                            {index + 1}
-                                        </td>
-                                        <td className="border border-gray-200 dark:border-gray-700 px-4 py-2 text-gray-700 dark:text-gray-300">
-                                            {user.name}
-                                        </td>
-                                        <td className="border border-gray-200 dark:border-gray-700 px-4 py-2 text-gray-700 dark:text-gray-300">
-                                            {user.email}
-                                        </td>
-                                        <td className="border border-gray-200 dark:border-gray-700 px-4 py-2 text-gray-700 dark:text-gray-300">
-                                            {user.commandes_count}
-                                        </td>
-                                    </tr>
-                                ))}
-                        </tbody>
-                    </table>
+                    <div className="overflow-x-auto">
+                        <table className="w-full border-collapse table-auto">
+                            <thead>
+                                <tr className="bg-gray-100 dark:bg-gray-700">
+                                    <th className="border px-4 py-2 text-left text-gray-700 dark:text-gray-300">
+                                        Rang
+                                    </th>
+                                    <th className="border px-4 py-2 text-left text-gray-700 dark:text-gray-300">
+                                        Nom
+                                    </th>
+                                    <th className="border px-4 py-2 text-left text-gray-700 dark:text-gray-300">
+                                        Email
+                                    </th>
+                                    <th className="border px-4 py-2 text-left text-gray-700 dark:text-gray-300">
+                                        Nombre de Commandes
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {uc
+                                    .sort((a, b) => b.commandes_count - a.commandes_count)
+                                    .map((user, index) => (
+                                        <tr
+                                            key={user.id}
+                                            className="hover:bg-gray-50 dark:hover:bg-gray-700"
+                                        >
+                                            <td className="border px-4 py-2 text-gray-700 dark:text-gray-300">
+                                                {index + 1}
+                                            </td>
+                                            <td className="border px-4 py-2 text-gray-700 dark:text-gray-300">
+                                                {user.name}
+                                            </td>
+                                            <td className="border px-4 py-2 text-gray-700 dark:text-gray-300">
+                                                {user.email}
+                                            </td>
+                                            <td className="border px-4 py-2 text-gray-700 dark:text-gray-300">
+                                                {user.commandes_count}
+                                            </td>
+                                        </tr>
+                                    ))}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </AuthenticatedLayout>
