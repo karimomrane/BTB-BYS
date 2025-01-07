@@ -29,13 +29,13 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
                     <div className="flex w-1/2 justify-end content-center">
                         <a
                             className="inline-block text-white no-underline hover:text-green-800 hover:text-underline text-center h-10 p-2 md:h-auto md:p-4"
-                            href="https://www.instagram.com/benyaghlaneshops/"
+                            href="https://www.facebook.com/benyaghlane.shops"
                         >
                             <FaFacebook />
                         </a>
                         <a
                             className="inline-block text-white no-underline hover:text-green-800 hover:text-underline text-center h-10 p-2 md:h-auto md:p-4"
-                            href="https://www.facebook.com/benyaghlane.shops"
+                            href="https://www.instagram.com/benyaghlaneshops/"
                         >
                             <FaInstagram />
                         </a>
