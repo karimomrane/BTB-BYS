@@ -1,3 +1,4 @@
+import { motion } from 'framer-motion';
 import Checkbox from '@/Components/Checkbox';
 import InputError from '@/Components/InputError';
 import InputLabel from '@/Components/InputLabel';
@@ -25,23 +26,53 @@ export default function Login({ status, canResetPassword }) {
         <GuestLayout>
             <Head title="Log in" />
 
-            <div className="flex text-center w-full items-center justify-center bg-gray-100 dark:bg-gray-900">
-                <div className="w-full max-w-md px-6 py-8 bg-white rounded-lg shadow-lg dark:bg-gray-800">
-                    <h2 className="text-2xl font-bold text-center text-gray-800 dark:text-gray-100">
-                        Welcome Back
-                    </h2>
-                    <p className="mt-2 text-center text-sm text-gray-600 dark:text-gray-400">
-                        Please sign in to your account.
-                    </p>
+            <motion.div
+                className="flex text-center w-full items-center justify-center bg-gray-100 dark:bg-gray-900"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.8 }}
+            >
+                <motion.div
+                    className="w-full max-w-md px-6 py-8 bg-white rounded-lg shadow-lg dark:bg-gray-800"
+                    initial={{ y: -50, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    transition={{ duration: 0.8, ease: 'easeOut' }}
+                >
+                    <motion.h2
+                        className="text-2xl font-bold text-center text-gray-800 dark:text-gray-100"
+                        initial={{ scale: 0.8 }}
+                        animate={{ scale: 1 }}
+                        transition={{ duration: 0.6 }}
+                    >
+                        Bienvenue de nouveau
+                    </motion.h2>
+                    <motion.p
+                        className="mt-2 text-center text-sm text-gray-600 dark:text-gray-400"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ delay: 0.3, duration: 0.8 }}
+                    >
+                        Connectez-vous pour continuer
+                    </motion.p>
 
                     {status && (
-                        <div className="mt-4 text-sm font-medium text-green-600">
+                        <motion.div
+                            className="mt-4 text-sm font-medium text-green-600"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            transition={{ duration: 0.5 }}
+                        >
                             {status}
-                        </div>
+                        </motion.div>
                     )}
 
                     <form onSubmit={submit} className="mt-6">
-                        <div className="mb-4">
+                        <motion.div
+                            className="mb-4"
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.4, duration: 0.6 }}
+                        >
                             <InputLabel htmlFor="email" value="Email" />
                             <TextInput
                                 id="email"
@@ -54,9 +85,14 @@ export default function Login({ status, canResetPassword }) {
                                 onChange={(e) => setData('email', e.target.value)}
                             />
                             <InputError message={errors.email} className="mt-2" />
-                        </div>
+                        </motion.div>
 
-                        <div className="mb-4">
+                        <motion.div
+                            className="mb-4"
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.5, duration: 0.6 }}
+                        >
                             <InputLabel htmlFor="password" value="Password" />
                             <TextInput
                                 id="password"
@@ -68,36 +104,47 @@ export default function Login({ status, canResetPassword }) {
                                 onChange={(e) => setData('password', e.target.value)}
                             />
                             <InputError message={errors.password} className="mt-2" />
-                        </div>
+                        </motion.div>
 
-                        <div className="flex items-center justify-between mb-4">
+                        <motion.div
+                            className="flex items-center justify-between mb-4"
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.6, duration: 0.6 }}
+                        >
                             <label className="flex items-center text-sm text-gray-600 dark:text-gray-400">
                                 <Checkbox
                                     name="remember"
                                     checked={data.remember}
                                     onChange={(e) => setData('remember', e.target.checked)}
                                 />
-                                <span className="ml-2">Remember me</span>
+                                <span className="ml-2">Se souvenir de moi</span>
                             </label>
                             {canResetPassword && (
                                 <Link
                                     href={route('password.request')}
                                     className="text-sm text-indigo-600 hover:underline dark:text-indigo-400"
                                 >
-                                    Forgot your password?
+                                    Oublier le mot de passe
                                 </Link>
                             )}
-                        </div>
+                        </motion.div>
 
-                        <PrimaryButton
-                            className="w-full py-2 rounded-lg flex items-center justify-center bg-indigo-600 text-white hover:bg-indigo-700 disabled:bg-indigo-400"
-                            disabled={processing}
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            transition={{ delay: 0.7, duration: 0.6 }}
                         >
-                            Log in
-                        </PrimaryButton>
+                            <PrimaryButton
+                                className="w-full py-2 rounded-lg flex items-center justify-center bg-indigo-600 text-white hover:bg-indigo-700 disabled:bg-indigo-400"
+                                disabled={processing}
+                            >
+                                Se connecter
+                            </PrimaryButton>
+                        </motion.div>
                     </form>
-                </div>
-            </div>
+                </motion.div>
+            </motion.div>
         </GuestLayout>
     );
 }

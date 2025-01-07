@@ -1,9 +1,22 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, usePage } from '@inertiajs/react';
-import { FaUsers, FaClipboardList, FaCheck, FaTruck } from 'react-icons/fa';
+import { FaUsers, FaClipboardList, FaTruck } from 'react-icons/fa';
+import { motion } from 'framer-motion';
 
-export default function Dashboard({comliv, uc, users, commandes }) {
+export default function Dashboard({ comliv, uc, users, commandes }) {
     const user = usePage().props.auth.user;
+
+    // Animation variants for cards
+    const cardVariants = {
+        hidden: { opacity: 0, y: 50 },
+        visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
+    };
+
+    // Animation variants for the table
+    const tableVariants = {
+        hidden: { opacity: 0, scale: 0.9 },
+        visible: { opacity: 1, scale: 1, transition: { duration: 0.5 } },
+    };
 
     return (
         <AuthenticatedLayout
@@ -16,9 +29,20 @@ export default function Dashboard({comliv, uc, users, commandes }) {
             <Head title="Dashboard" />
 
             {/* Stats Cards */}
-            <div className="grid gap-6 p-6 sm:grid-cols-2 lg:grid-cols-3">
+            <motion.div
+                className="grid gap-6 p-6 sm:grid-cols-2 lg:grid-cols-3"
+                initial="hidden"
+                animate="visible"
+                variants={{
+                    hidden: {},
+                    visible: { transition: { staggerChildren: 0.2 } },
+                }}
+            >
                 {user.role === 'admin' && (
-                    <div className="flex items-center rounded-lg bg-white p-6 shadow-lg dark:bg-gray-800">
+                    <motion.div
+                        className="flex items-center rounded-lg bg-white p-6 shadow-lg dark:bg-gray-800"
+                        variants={cardVariants}
+                    >
                         <div className="mr-4 flex items-center justify-center h-12 w-12 rounded-full bg-blue-100 dark:bg-blue-900">
                             <FaUsers
                                 className="text-blue-500 dark:text-blue-400"
@@ -33,10 +57,13 @@ export default function Dashboard({comliv, uc, users, commandes }) {
                                 {users}
                             </p>
                         </div>
-                    </div>
+                    </motion.div>
                 )}
 
-                <div className="flex items-center rounded-lg bg-white p-6 shadow-lg dark:bg-gray-800">
+                <motion.div
+                    className="flex items-center rounded-lg bg-white p-6 shadow-lg dark:bg-gray-800"
+                    variants={cardVariants}
+                >
                     <div className="mr-4 flex items-center justify-center h-12 w-12 rounded-full bg-orange-100 dark:bg-orange-900">
                         <FaClipboardList
                             className="text-orange-500 dark:text-orange-400"
@@ -51,8 +78,12 @@ export default function Dashboard({comliv, uc, users, commandes }) {
                             {commandes}
                         </p>
                     </div>
-                </div>
-                <div className="flex items-center rounded-lg bg-white p-6 shadow-lg dark:bg-gray-800">
+                </motion.div>
+
+                <motion.div
+                    className="flex items-center rounded-lg bg-white p-6 shadow-lg dark:bg-gray-800"
+                    variants={cardVariants}
+                >
                     <div className="mr-4 flex items-center justify-center h-12 w-12 rounded-full bg-green-100 dark:bg-green-900">
                         <FaTruck
                             className="text-green-500 dark:text-green-400"
@@ -67,11 +98,16 @@ export default function Dashboard({comliv, uc, users, commandes }) {
                             {comliv ? comliv : 0}
                         </p>
                     </div>
-                </div>
-            </div>
+                </motion.div>
+            </motion.div>
 
             {/* Ranking Table */}
-            <div className="p-6">
+            <motion.div
+                className="p-6"
+                initial="hidden"
+                animate="visible"
+                variants={tableVariants}
+            >
                 <div className="rounded-lg bg-white p-6 shadow-lg dark:bg-gray-800">
                     <h3 className="mb-4 text-lg font-semibold text-gray-800 dark:text-gray-200">
                         Classement des utilisateurs par commandes
@@ -120,7 +156,7 @@ export default function Dashboard({comliv, uc, users, commandes }) {
                         </table>
                     </div>
                 </div>
-            </div>
+            </motion.div>
         </AuthenticatedLayout>
     );
 }

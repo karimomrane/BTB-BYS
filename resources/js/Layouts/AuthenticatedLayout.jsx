@@ -227,7 +227,13 @@ export default function AuthenticatedLayout({ header, children }) {
             {header && (
                 <header className="bg-white shadow dark:bg-gray-800">
                     <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+                        <motion.span
+                            initial={{ y: -100, opacity: 0 }}
+                            animate={{ y: 0, opacity: 1 }}
+                            transition={{ duration: 0.5 }}
+                        >
                         {header}
+                        </motion.span>
                     </div>
                 </header>
             )}

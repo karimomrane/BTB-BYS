@@ -1,26 +1,26 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
-import { Head, useForm, usePage } from "@inertiajs/react";
+import { Head, useForm } from "@inertiajs/react";
+import { motion } from "framer-motion";
+import toast, { Toaster } from 'react-hot-toast';
 
 const Add = () => {
-    // Define the form state using the useForm hook
     const { data, setData, post, errors, processing } = useForm({
         nbpanier: "",
         date: "",
         description: "",
     });
+
     const cartProducts = [
         { name: "Sucre", quantity: 2 },
         { name: "Farine", quantity: 1 },
         { name: "Dattes", quantity: 3 },
     ];
 
-
-    // Handle form submission
     const submit = (e) => {
         e.preventDefault();
         post(route("commandes.store"), {
             onSuccess: () => {
-                // Optionally handle success (e.g., redirect or show a success message)
+                toast('Here is your toast.');
             },
         });
     };
@@ -34,15 +34,31 @@ const Add = () => {
             }
         >
             <Head title="Ajouter une commande" />
-
-            <div className="py-12">
+            <Toaster
+                position="bottom-center"
+                reverseOrder={false}
+            />
+            <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.5 }}
+                className="py-5"
+            >
                 <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
-                    <div className="overflow-hidden bg-white shadow-sm sm:rounded-lg dark:bg-gray-800">
+                    <motion.div
+                        initial={{ y: -50, opacity: 0 }}
+                        animate={{ y: 0, opacity: 1 }}
+                        transition={{ duration: 0.5 }}
+                        className="overflow-hidden bg-white shadow-sm sm:rounded-lg dark:bg-gray-800"
+                    >
                         <div className="p-6 text-gray-900 dark:text-gray-100">
-                            {/* Two-column layout */}
                             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                                {/* Left Side: Form */}
-                                <div>
+                                {/* Form Section */}
+                                <motion.div
+                                    initial={{ x: -100, opacity: 0 }}
+                                    animate={{ x: 0, opacity: 1 }}
+                                    transition={{ duration: 0.5 }}
+                                >
                                     <form onSubmit={submit}>
                                         <div className="mb-4">
                                             <label className="block text-sm font-medium text-gray-700 dark:text-gray-400">
@@ -79,53 +95,68 @@ const Add = () => {
                                             />
                                             <span className="text-red-500 text-xs">{errors.description}</span>
                                         </div>
-                                        <button
+                                        <motion.button
+                                            whileHover={{ scale: 1.05 }}
+                                            whileTap={{ scale: 0.95 }}
                                             type="submit"
                                             disabled={processing}
                                             className="inline-flex items-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:bg-indigo-500 dark:hover:bg-indigo-400"
                                         >
                                             Ajouter
-                                        </button>
+                                        </motion.button>
                                     </form>
-                                </div>
+                                </motion.div>
 
-                                {/* Right Side: Image and Cart Description */}
-                                <div className="flex flex-col items-center">
-                                    {/* Image */}
+                                {/* Image and Product List Section */}
+                                <motion.div
+                                    initial={{ x: 100, opacity: 0 }}
+                                    animate={{ x: 0, opacity: 1 }}
+                                    transition={{ duration: 0.5 }}
+                                    className="flex flex-col items-center"
+                                >
                                     <img
-                                        src="/carttt.png" /* Replace with your image URL */
+                                        src="/carttt.png"
                                         alt="Ramadhan Cart"
                                         className="w-1/2 rounded-lg shadow-md"
                                     />
-                                    {/* Cart Products Description */}
                                     <div className="mt-4 text-center">
                                         <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200">
                                             Produits dans le Panier
                                         </h3>
-                                        <ul className="mt-2 text-sm text-gray-600 dark:text-gray-400 list-disc list-inside">
+                                        <motion.ul
+                                            initial={{ opacity: 0 }}
+                                            animate={{ opacity: 1 }}
+                                            transition={{ duration: 1 }}
+                                            className="mt-2 text-sm text-gray-600 dark:text-gray-400 list-disc list-inside"
+                                        >
                                             {cartProducts.length > 0 ? (
                                                 cartProducts.map((product, index) => (
-                                                    <li key={index}>
+                                                    <motion.li
+                                                        key={index}
+                                                        initial={{ x: -20, opacity: 0 }}
+                                                        animate={{ x: 0, opacity: 1 }}
+                                                        transition={{ delay: index * 0.2 }}
+                                                    >
                                                         <span className="font-medium text-gray-800 dark:text-gray-200">
                                                             {product.name}
                                                         </span>{" "}
-                                                        - {product.quantity} unité{product.quantity > 1 ? "s" : ""}
-                                                    </li>
+                                                        - {product.quantity} unité
+                                                        {product.quantity > 1 ? "s" : ""}
+                                                    </motion.li>
                                                 ))
                                             ) : (
                                                 <li>Aucun produit dans le panier.</li>
                                             )}
-                                        </ul>
+                                        </motion.ul>
                                     </div>
-                                </div>
+                                </motion.div>
                             </div>
                         </div>
-                    </div>
+                    </motion.div>
                 </div>
-            </div>
+            </motion.div>
+
         </AuthenticatedLayout>
-
-
     );
 };
 

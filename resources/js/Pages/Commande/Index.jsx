@@ -1,9 +1,12 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Head, Link, usePage } from "@inertiajs/react";
+import toast, { Toaster } from 'react-hot-toast';
 
-const Index = ({ commandes }) => {
+const Index = ({ commandes,status }) => {
     const user = usePage().props.auth.user;
-
+    if (status){
+        toast.success(status);
+    }
     return (
         <AuthenticatedLayout
             header={
@@ -13,7 +16,7 @@ const Index = ({ commandes }) => {
             }
         >
             <Head title="Liste des commandes" />
-
+            <Toaster />
             <div className="py-12">
                 <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
                     <div className="overflow-hidden bg-white shadow-sm sm:rounded-lg dark:bg-gray-800">

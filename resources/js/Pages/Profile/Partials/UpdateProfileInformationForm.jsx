@@ -4,6 +4,7 @@ import PrimaryButton from '@/Components/PrimaryButton';
 import TextInput from '@/Components/TextInput';
 import { Transition } from '@headlessui/react';
 import { Link, useForm, usePage } from '@inertiajs/react';
+import { motion } from 'framer-motion';
 
 export default function UpdateProfileInformation({
     mustVerifyEmail,
@@ -28,110 +29,61 @@ export default function UpdateProfileInformation({
         patch(route('profile.update'));
     };
 
+    const containerVariants = {
+        hidden: { opacity: 0, y: -20 },
+        visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
+    };
+
+    const inputVariants = {
+        hidden: { opacity: 0, x: -20 },
+        visible: { opacity: 1, x: 0, transition: { duration: 0.3 } },
+    };
+
     return (
-        <section className={className}>
-            <header>
+        <motion.section
+            className={className}
+            initial="hidden"
+            animate="visible"
+            variants={containerVariants}
+        >
+            <motion.header variants={inputVariants}>
                 <h2 className="text-lg font-medium text-gray-900 dark:text-gray-100">
                     Profile Information
                 </h2>
-
                 <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
                     Update your account's profile information and email address.
                 </p>
-            </header>
+            </motion.header>
 
             <form onSubmit={submit} className="mt-6 space-y-6">
-                <div>
-                    <InputLabel htmlFor="name" value="Name" />
-
-                    <TextInput
-                        id="name"
-                        className="mt-1 block w-full"
-                        value={data.name}
-                        onChange={(e) => setData('name', e.target.value)}
-                        required
-                        isFocused
-                        autoComplete="name"
-                    />
-
-                    <InputError className="mt-2" message={errors.name} />
-                </div>
-
-                <div>
-                    <InputLabel htmlFor="email" value="Email" />
-
-                    <TextInput
-                        id="email"
-                        type="email"
-                        className="mt-1 block w-full"
-                        value={data.email}
-                        onChange={(e) => setData('email', e.target.value)}
-                        required
-                        autoComplete="username"
-                    />
-
-                    <InputError className="mt-2" message={errors.email} />
-                </div>
-
-                <div>
-                    <InputLabel htmlFor="adresse" value="Adresse" />
-
-                    <TextInput
-                        id="adresse"
-                        className="mt-1 block w-full"
-                        value={data.adresse}
-                        onChange={(e) => setData('adresse', e.target.value)}
-
-                    />
-
-                    <InputError className="mt-2" message={errors.adresse} />
-                </div>
-                <div>
-                    <InputLabel htmlFor="tel" value="Telephone" />
-
-                    <TextInput
-                        id="tel"
-                        className="mt-1 block w-full"
-                        value={data.tel}
-                        onChange={(e) => setData('tel', e.target.value)}
-
-                    />
-
-                    <InputError className="mt-2" message={errors.tel} />
-                </div>
-
-                <div>
-                    <InputLabel htmlFor="siteweb" value="Site Web" />
-
-                    <TextInput
-                        id="siteweb"
-                        className="mt-1 block w-full"
-                        value={data.siteweb}
-                        onChange={(e) => setData('siteweb', e.target.value)}
-                    />
-
-                    <InputError className="mt-2" message={errors.siteweb} />
-                </div>
-                <div>
-                    <InputLabel htmlFor="role" value="Role" />
-
-                    <TextInput
-                        id="role"
-                        className="mt-1 block w-full bg-gray-100 text-gray-500"
-                        value={data.role}
-                        onChange={(e) => setData('role', e.target.value)}
-
-                        disabled
-                    />
-
-                    <InputError className="mt-2" message={errors.role} />
-                </div>
-
-
-
+                {['name', 'email', 'adresse', 'tel', 'siteweb', 'role'].map(
+                    (field, index) => (
+                        <motion.div key={field} variants={inputVariants}>
+                            <InputLabel
+                                htmlFor={field}
+                                value={field.charAt(0).toUpperCase() + field.slice(1)}
+                            />
+                            <TextInput
+                                id={field}
+                                type={field === 'email' ? 'email' : 'text'}
+                                className={`mt-1 block w-full ${
+                                    field === 'role'
+                                        ? 'bg-gray-100 text-gray-500'
+                                        : ''
+                                }`}
+                                value={data[field]}
+                                onChange={(e) => setData(field, e.target.value)}
+                                required={field !== 'adresse' && field !== 'tel' && field !== 'siteweb'}
+                                disabled={field === 'role'}
+                                autoComplete={field}
+                            />
+                            <InputError className="mt-2" message={errors[field]} />
+                        </motion.div>
+                    )
+                )}
 
                 {mustVerifyEmail && user.email_verified_at === null && (
-                    <div>
+                    <motion.div variants={inputVariants}>
                         <p className="mt-2 text-sm text-gray-800 dark:text-gray-200">
                             Your email address is unverified.
                             <Link
@@ -150,10 +102,13 @@ export default function UpdateProfileInformation({
                                 email address.
                             </div>
                         )}
-                    </div>
+                    </motion.div>
                 )}
 
-                <div className="flex items-center gap-4">
+                <motion.div
+                    className="flex items-center gap-4"
+                    variants={inputVariants}
+                >
                     <PrimaryButton disabled={processing}>Save</PrimaryButton>
 
                     <Transition
@@ -167,8 +122,8 @@ export default function UpdateProfileInformation({
                             Saved.
                         </p>
                     </Transition>
-                </div>
+                </motion.div>
             </form>
-        </section>
+        </motion.section>
     );
 }
