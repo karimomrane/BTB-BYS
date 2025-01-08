@@ -1,0 +1,18 @@
+# Use Node.js 17 as the base image
+FROM node:20
+
+# Set the working directory
+WORKDIR /var/www
+
+# Copy the React app to the container
+COPY ./package*.json ./
+RUN npm install
+
+# Copy the remaining frontend files
+COPY ./resources/js ./
+
+# Expose the React app port
+EXPOSE 3000
+
+# Start the React app
+CMD ["npm", "run", "dev"]
