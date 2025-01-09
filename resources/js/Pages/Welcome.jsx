@@ -5,24 +5,8 @@ import { FaFacebook, FaInstagram } from "react-icons/fa";
 import { motion } from "framer-motion";
 
 export default function Welcome({ auth, laravelVersion, phpVersion }) {
-    const [isAnimating, setIsAnimating] = useState(true);
 
-    useEffect(() => {
-        // Set overflow hidden during animation
-        document.body.style.overflow = isAnimating ? "hidden" : "hidden";
 
-        // Reset the body overflow after the animation
-        if (!isAnimating) {
-            document.body.style.overflow = "hidden";
-        }
-    }, [isAnimating]);
-
-    const handleImageError = () => {
-        document.getElementById("screenshot-container")?.classList.add("!hidden");
-        document.getElementById("docs-card")?.classList.add("!row-span-1");
-        document.getElementById("docs-card-content")?.classList.add("!flex-row");
-        document.getElementById("background")?.classList.add("!hidden");
-    };
 
     return (
         <motion.div
