@@ -17,7 +17,7 @@ RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local
 
 # Install Laravel dependencies
 RUN composer install
-
+RUN php artisan migrate
 # Expose the port the app will run on
 EXPOSE 9000
 
