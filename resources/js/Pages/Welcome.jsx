@@ -14,7 +14,7 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
             animate={{ opacity: 1 }}
             transition={{ duration: 1 }}
             className="h-screen flex flex-col justify-between bg-cover bg-center"
-            style={{ backgroundImage: "url(bgg.png)" }}
+            style={{ backgroundImage: "url(bgc.jpg)" }}
             onAnimationComplete={() => setIsAnimating(false)} // When the animation ends
         >
             {/* Nav */}
