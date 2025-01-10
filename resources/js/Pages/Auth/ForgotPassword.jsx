@@ -3,7 +3,7 @@ import PrimaryButton from '@/Components/PrimaryButton';
 import TextInput from '@/Components/TextInput';
 import GuestLayout from '@/Layouts/GuestLayout';
 import { Head, useForm } from '@inertiajs/react';
-
+import { motion } from 'framer-motion';
 export default function ForgotPassword({ status }) {
     const { data, setData, post, processing, errors } = useForm({
         email: '',
@@ -19,11 +19,13 @@ export default function ForgotPassword({ status }) {
         <GuestLayout>
             <Head title="Forgot Password" />
 
-            <div className="mb-4 text-sm text-gray-600 dark:text-gray-400">
+            <motion.div
+            className="w-full max-w-md px-6 py-8 bg-white rounded-lg shadow-lg dark:bg-gray-800"
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
                 Forgot your password? No problem. Just let us know your email
                 address and we will email you a password reset link that will
                 allow you to choose a new one.
-            </div>
+            </motion.div>
 
             {status && (
                 <div className="mb-4 text-sm font-medium text-green-600 dark:text-green-400">
@@ -31,7 +33,8 @@ export default function ForgotPassword({ status }) {
                 </div>
             )}
 
-            <form onSubmit={submit}>
+            <motion.form onSubmit={submit}
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
                 <TextInput
                     id="email"
                     type="email"
@@ -49,7 +52,7 @@ export default function ForgotPassword({ status }) {
                         Email Password Reset Link
                     </PrimaryButton>
                 </div>
-            </form>
+            </motion.form>
         </GuestLayout>
     );
 }
