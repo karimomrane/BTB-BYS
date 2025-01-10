@@ -67,7 +67,7 @@ const Add = () => {
                                     animate={{ opacity: 1 }}
                                     transition={{ duration: 0.5, delay: 0.5 }}
                                     className="flex flex-col items-center mb-8 lg:mb-0 bg-cover bg-center p-6 rounded-lg"
-                                    style={{ backgroundImage: 'url(/CMD.jpg)' }}
+                                    style={{ backgroundImage: 'url(/cmdd.jpg)' }}
                                 >
                                     <div className="bg-black bg-opacity-40 p-4 rounded-lg w-full">
                                         <button
