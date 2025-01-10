@@ -1,9 +1,12 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Head, useForm } from "@inertiajs/react";
-import { motion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
+import { useState } from "react";
 import toast, { Toaster } from 'react-hot-toast';
 
 const Add = () => {
+    const [showProducts, setShowProducts] = useState(false);
+
     const { data, setData, post, errors, processing } = useForm({
         nbpanier: "",
         date: "",
@@ -11,10 +14,18 @@ const Add = () => {
     });
 
     const cartProducts = [
-        { name: "Sucre", quantity: 2 },
-        { name: "Farine", quantity: 1 },
         { name: "Dattes", quantity: 3 },
+        { name: "Farine", quantity: 2 },
+        { name: "Lait en poudre", quantity: 1 },
+        { name: "Sucre", quantity: 2 },
+        { name: "Chorba Épices", quantity: 1 },
+        { name: "Pois chiches", quantity: 1 },
+        { name: "Miel", quantity: 1 },
+        { name: "Thé vert", quantity: 2 },
+        { name: "Semoule", quantity: 2 },
+        { name: "Olives", quantity: 1 },
     ];
+
 
     const submit = (e) => {
         e.preventDefault();
@@ -34,10 +45,7 @@ const Add = () => {
             }
         >
             <Head title="Ajouter une commande" />
-            <Toaster
-                position="bottom-center"
-                reverseOrder={false}
-            />
+            <Toaster position="bottom-center" reverseOrder={false} />
             <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
@@ -53,11 +61,80 @@ const Add = () => {
                     >
                         <div className="p-6 text-gray-900 dark:text-gray-100">
                             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                                {/* Product List Section */}
+                                <motion.div
+                                    initial={{ opacity: 0 }}
+                                    animate={{ opacity: 1 }}
+                                    transition={{ duration: 0.5, delay: 0.5 }}
+                                    className="flex flex-col items-center mb-8 lg:mb-0 bg-cover bg-center p-6 rounded-lg"
+                                    style={{ backgroundImage: 'url(/CMD.jpg)' }}
+                                >
+                                    <div className="bg-black bg-opacity-40 p-4 rounded-lg w-full">
+                                        <button
+                                            onClick={() => setShowProducts((prev) => !prev)}
+                                            className="w-full text-left bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded-lg flex items-center justify-between"
+                                        >
+                                            <span>Produits dans le Panier</span>
+                                            <motion.span
+                                                initial={{ rotate: 0 }}
+                                                animate={{ rotate: showProducts ? 180 : 0 }}
+                                                transition={{ duration: 0.3 }}
+                                                className="ml-2 transform"
+                                            >
+                                                ▼
+                                            </motion.span>
+                                        </button>
+                                        <AnimatePresence>
+                                            {showProducts && (
+                                                <motion.div
+                                                    initial={{ opacity: 0, height: 0 }}
+                                                    animate={{ opacity: 1, height: 'auto' }}
+                                                    exit={{ opacity: 0, height: 0 }}
+                                                    transition={{ duration: 0.2 }}
+                                                    className="mt-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"
+                                                >
+                                                    {cartProducts.length > 0 ? (
+                                                        cartProducts.map((product, index) => (
+                                                            <motion.div
+                                                                key={index}
+                                                                initial={{ x: -20, opacity: 0 }}
+                                                                animate={{ x: 0, opacity: 1 }}
+                                                                transition={{ delay: index * 0.2 }}
+                                                                className="text-sm flex flex-col text-center items-center justify-between p-2 bg-white rounded-lg shadow-sm hover:bg-indigo-50 dark:bg-gray-800 dark:hover:bg-gray-700"
+                                                            >
+                                                                <span className="font-medium text-indigo-600 dark:text-indigo-400">
+                                                                    {product.name || "Produit inconnu"}
+                                                                </span>
+                                                                <span className="text-sm text-gray-600 dark:text-gray-300">
+                                                                    {product.quantity} unité{product.quantity > 1 ? "s" : ""}
+                                                                </span>
+                                                            </motion.div>
+                                                        ))
+                                                    ) : (
+                                                        <motion.div
+                                                            initial={{ opacity: 0 }}
+                                                            animate={{ opacity: 1 }}
+                                                            exit={{ opacity: 0 }}
+                                                            className="col-span-full text-center text-gray-500 dark:text-gray-400"
+                                                        >
+                                                            Aucun produit dans le panier.
+                                                        </motion.div>
+                                                    )}
+                                                </motion.div>
+                                            )}
+                                        </AnimatePresence>
+                                    </div>
+                                </motion.div>
+
+
+
+
                                 {/* Form Section */}
                                 <motion.div
-                                    initial={{ x: -100, opacity: 0 }}
-                                    animate={{ x: 0, opacity: 1 }}
-                                    transition={{ duration: 0.5 }}
+                                    initial={{ opacity: 0, x: 100 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    transition={{ duration: 0.5, delay: 1 }}
+                                    className="lg:flex-1"
                                 >
                                     <form onSubmit={submit}>
                                         <div className="mb-4">
@@ -106,56 +183,11 @@ const Add = () => {
                                         </motion.button>
                                     </form>
                                 </motion.div>
-
-                                {/* Image and Product List Section */}
-                                <motion.div
-                                    initial={{ x: 100, opacity: 0 }}
-                                    animate={{ x: 0, opacity: 1 }}
-                                    transition={{ duration: 0.5 }}
-                                    className="flex flex-col items-center"
-                                >
-                                    <img
-                                        src="/carttt.png"
-                                        alt="Ramadhan Cart"
-                                        className="w-1/2 rounded-lg shadow-md"
-                                    />
-                                    <div className="mt-4 text-center">
-                                        <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200">
-                                            Produits dans le Panier
-                                        </h3>
-                                        <motion.ul
-                                            initial={{ opacity: 0 }}
-                                            animate={{ opacity: 1 }}
-                                            transition={{ duration: 1 }}
-                                            className="mt-2 text-sm text-gray-600 dark:text-gray-400 list-disc list-inside"
-                                        >
-                                            {cartProducts.length > 0 ? (
-                                                cartProducts.map((product, index) => (
-                                                    <motion.li
-                                                        key={index}
-                                                        initial={{ x: -20, opacity: 0 }}
-                                                        animate={{ x: 0, opacity: 1 }}
-                                                        transition={{ delay: index * 0.2 }}
-                                                    >
-                                                        <span className="font-medium text-gray-800 dark:text-gray-200">
-                                                            {product.name}
-                                                        </span>{" "}
-                                                        - {product.quantity} unité
-                                                        {product.quantity > 1 ? "s" : ""}
-                                                    </motion.li>
-                                                ))
-                                            ) : (
-                                                <li>Aucun produit dans le panier.</li>
-                                            )}
-                                        </motion.ul>
-                                    </div>
-                                </motion.div>
                             </div>
                         </div>
                     </motion.div>
                 </div>
             </motion.div>
-
         </AuthenticatedLayout>
     );
 };

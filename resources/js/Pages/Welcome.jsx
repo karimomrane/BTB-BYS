@@ -61,10 +61,10 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
                     className="w-full lg:w-1/2 mb-12 lg:mb-0 text-center lg:text-left"
                 >
                     <h1 className="text-4xl md:text-5xl text-white font-bold leading-tight mb-6">
-                        BTB By Ben Yaghlane Shops
+                        B2B By Ben Yaghlane Shops
                     </h1>
                     <p className="text-gray-100 text-lg md:text-xl mb-6">
-                        BTB by Ben Yaghlane Shops is your one-stop solution for all your shopping needs.
+                        B2B by Ben Yaghlane Shops is your one-stop solution for all your shopping needs.
                     </p>
                     <motion.div
                         initial={{ scale: 0.9, opacity: 0 }}
