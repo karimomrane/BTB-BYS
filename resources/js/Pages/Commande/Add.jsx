@@ -31,7 +31,7 @@ const Add = () => {
         e.preventDefault();
         post(route("commandes.store"), {
             onSuccess: () => {
-                toast('Here is your toast.');
+
             },
         });
     };
