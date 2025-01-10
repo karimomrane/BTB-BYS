@@ -1,12 +1,26 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Head, Link, usePage } from "@inertiajs/react";
-import toast, { Toaster } from 'react-hot-toast';
+import toast, { Toaster } from "react-hot-toast";
 
-const Index = ({ commandes,status }) => {
+const Index = ({ commandes, status }) => {
     const user = usePage().props.auth.user;
-    if (status){
+
+    // Show toast notification for status
+    if (status) {
         toast.success(status);
     }
+
+    // Status styles mapping
+    const statusStyles = {
+        "Commandé": "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200",
+        "En cours de préparation": "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200",
+        "Préparé": "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200",
+        "En cours de livraison": "bg-teal-100 text-teal-800 dark:bg-teal-900 dark:text-teal-200",
+        "Livré": "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200",
+        "Payé": "bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200",
+        "Annulé": "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200",
+    };
+
     return (
         <AuthenticatedLayout
             header={
@@ -52,25 +66,29 @@ const Index = ({ commandes,status }) => {
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
                                                     {commande.date}
                                                 </td>
-                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                                                    {commande.status}
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm">
+                                                    <span
+                                                        className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${statusStyles[commande.status]}`}
+                                                    >
+                                                        {commande.status}
+                                                    </span>
                                                 </td>
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
                                                     {commande.user.name}
                                                 </td>
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                                                    {new Date(commande.created_at).toLocaleDateString('fr-FR')}
+                                                    {new Date(commande.created_at).toLocaleDateString("fr-FR")}
                                                 </td>
-                                                {user.role === 'admin' && (
+                                                {user.role === "admin" && (
                                                     <td className="px-6 py-4 whitespace-nowrap flex gap-4">
                                                         <Link
-                                                            href={route('commandes.edit', commande.id)}
+                                                            href={route("commandes.edit", commande.id)}
                                                             className="text-blue-600 hover:text-blue-900 dark:text-blue-500 dark:hover:text-blue-400 transition"
                                                         >
                                                             Editer
                                                         </Link>
                                                         <Link
-                                                            href={route('commandes.destroy', commande.id)}
+                                                            href={route("commandes.destroy", commande.id)}
                                                             method="delete"
                                                             as="button"
                                                             type="button"
