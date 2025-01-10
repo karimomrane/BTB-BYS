@@ -137,6 +137,25 @@ export default function Navbar() {
                     </div>
 
                     <div className="-me-2 flex items-center sm:hidden">
+                         {/* Dark Mode Toggle */}
+                         <div
+                                onClick={() => setIsDarkMode((prev) => !prev)}
+                                className={`mr-5 flex h-[35px] w-[70px] rounded-[50px] bg-zinc-100 p-[3px] shadow-inner hover:cursor-pointer dark:bg-zinc-700 ${isDarkMode && 'place-content-end'}`}
+                            >
+                                <motion.div
+                                    className="flex h-[28px] w-[28px] items-center justify-center rounded-full bg-black/90"
+                                    layout
+                                    transition={spring}
+                                >
+                                    <motion.div whileTap={{ rotate: 360 }}>
+                                        {isDarkMode ? (
+                                            <FaSun className="h-5 w-5 text-yellow-300" />
+                                        ) : (
+                                            <FaMoon className="h-5 w-5 text-slate-200" />
+                                        )}
+                                    </motion.div>
+                                </motion.div>
+                            </div>
                         <button
                             onClick={() =>
                                 setShowingNavigationDropdown(
