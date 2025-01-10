@@ -23,7 +23,7 @@ const Index = ({ commandes,status }) => {
                         <div className="p-6 text-gray-900 dark:text-gray-100">
                             <div className="overflow-x-auto">
                                 <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                                    <thead className="bg-gray-50 dark:bg-gray-700">
+                                    <thead className="bg-gray-50 dark:bg-gray-900">
                                         <tr>
                                             {["ID", "Nombre de paniers", "Date Prévu", "Status", "Créé par", "Créé le", user.role === 'admin' && "Action"]
                                                 .filter(Boolean)

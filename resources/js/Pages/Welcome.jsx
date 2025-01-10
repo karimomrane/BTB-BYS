@@ -6,7 +6,7 @@ import { motion } from "framer-motion";
 
 export default function Welcome({ auth, laravelVersion, phpVersion }) {
 
-
+const [isAnimating, setIsAnimating] = useState(true);
 
     return (
         <motion.div

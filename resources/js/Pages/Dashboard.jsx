@@ -113,50 +113,52 @@ export default function Dashboard({ comliv, uc, users, commandes }) {
                         Classement des utilisateurs par commandes
                     </h3>
                     <div className="overflow-x-auto">
-                        <table className="w-full border-collapse table-auto">
-                            <thead>
-                                <tr className="bg-gray-100 dark:bg-gray-700">
-                                    <th className="border px-4 py-2 text-left text-gray-700 dark:text-gray-300">
-                                        Rang
-                                    </th>
-                                    <th className="border px-4 py-2 text-left text-gray-700 dark:text-gray-300">
-                                        Nom
-                                    </th>
-                                    <th className="border px-4 py-2 text-left text-gray-700 dark:text-gray-300">
-                                        Email
-                                    </th>
-                                    <th className="border px-4 py-2 text-left text-gray-700 dark:text-gray-300">
-                                        Nombre de Commandes
-                                    </th>
+                        <table className="w-full table-auto border-separate border-spacing-0">
+                            <thead className='bg-gray-50 dark:bg-gray-900'>
+                                <tr>
+                                    {["Rang", "Nom", "Email", "Nombre de Commandes"]
+                                        .filter(Boolean)
+                                        .map((header) => (
+                                            <th
+                                                key={header}
+                                                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400"
+                                            >
+                                                {header}
+                                            </th>
+                                        ))}
                                 </tr>
                             </thead>
-                            <tbody>
+                            <tbody className="bg-white divide-y divide-gray-200 dark:bg-gray-800 dark:divide-gray-700">
                                 {uc
                                     .sort((a, b) => b.commandes_count - a.commandes_count)
                                     .map((user, index) => (
-                                        <tr
+                                        <motion.tr
                                             key={user.id}
-                                            className="hover:bg-gray-50 dark:hover:bg-gray-700"
+                                            className="group hover:bg-gray-50 dark:hover:bg-gray-700"
+                                            initial={{ opacity: 0 }}
+                                            animate={{ opacity: 1 }}
+                                            transition={{ delay: index * 0.1, duration: 0.3 }}
                                         >
-                                            <td className="border px-4 py-2 text-gray-700 dark:text-gray-300">
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
                                                 {index + 1}
                                             </td>
-                                            <td className="border px-4 py-2 text-gray-700 dark:text-gray-300">
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
                                                 {user.name}
                                             </td>
-                                            <td className="border px-4 py-2 text-gray-700 dark:text-gray-300">
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
                                                 {user.email}
                                             </td>
-                                            <td className="border px-4 py-2 text-gray-700 dark:text-gray-300">
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
                                                 {user.commandes_count}
                                             </td>
-                                        </tr>
+                                        </motion.tr>
                                     ))}
                             </tbody>
                         </table>
                     </div>
                 </div>
             </motion.div>
+
         </AuthenticatedLayout>
     );
 }
