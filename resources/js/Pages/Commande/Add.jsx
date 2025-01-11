@@ -157,10 +157,12 @@ const Add = () => {
                                                 type="date"
                                                 value={data.date}
                                                 onChange={(e) => setData("date", e.target.value)}
+                                                min={new Date().toISOString().split("T")[0]} // Set today's date as the minimum
                                                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300"
                                             />
                                             <span className="text-red-500 text-xs">{errors.date}</span>
                                         </div>
+
                                         <div className="mb-4">
                                             <label className="block text-sm font-medium text-gray-700 dark:text-gray-400">
                                                 Description (optionnel)
