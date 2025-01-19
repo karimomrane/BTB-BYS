@@ -1,16 +1,11 @@
-import pdfMake from "pdfmake/build/pdfmake";
-import pdfFonts from "pdfmake/build/vfs_fonts";
+export const generateCommandePDF = async (commande, panierCommandes, calculateTotal) => {
+    // Dynamically import pdfmake
+    const pdfMake = await import("pdfmake/build/pdfmake");
+    const pdfFonts = await import("pdfmake/build/vfs_fonts");
 
-// Register the fonts
-pdfMake.vfs = pdfFonts.pdfMake.vfs;
+    // Register the fonts
+    pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
-/**
- * Generates and downloads a PDF for a given commande.
- * @param {Object} commande - The commande object.
- * @param {Array} panierCommandes - The list of panierCommandes associated with the commande.
- * @param {Function} calculateTotal - A function to calculate the total for the commande.
- */
-export const generateCommandePDF = (commande, panierCommandes, calculateTotal) => {
     // Define the document content
     const documentDefinition = {
         content: [
