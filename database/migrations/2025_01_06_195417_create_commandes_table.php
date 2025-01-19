@@ -13,7 +13,6 @@ return new class extends Migration
     {
         Schema::create('commandes', function (Blueprint $table) {
             $table->id();
-            $table->string('nbpanier');
             $table->date('date');
             $table->string('status')->default('Commandé');
             $table->string('description')->nullable();

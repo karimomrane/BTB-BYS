@@ -1,12 +1,23 @@
+import NavLink from "@/Components/NavLink";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
-import { Head, Link } from "@inertiajs/react";
+import { Head, Link, usePage } from "@inertiajs/react";
 
 const Index = ({ users }) => {
+    const user = usePage().props.auth.user;
+
     return (
         <AuthenticatedLayout
             header={
                 <h2 className="text-xl font-semibold leading-tight text-gray-800 dark:text-gray-200">
-                    Liste des Utilisateurs
+                    {user.role === 'admin' && (
+                        <NavLink
+                            href={route('users.create')}
+                            active={route().current('users.create')}
+                            className="px-4 py-2 rounded border-b-2 border-indigo-600"
+                        >
+                            Ajouter Utilisateur
+                        </NavLink>
+                    )}
                 </h2>
             }
         >

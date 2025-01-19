@@ -1,11 +1,9 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Head, useForm, usePage } from "@inertiajs/react";
-import { useEffect } from "react";
 
 const Edit = () => {
     const { commande } = usePage().props;  // Retrieve the passed 'commande' data from Inertia
     const { data, setData, put, errors, processing } = useForm({
-        nbpanier: commande.nbpanier,  // Set initial form values with the existing commande data
         date: commande.date,
         description: commande.description,  // Add description field
         status: commande.status,  // Add status field
@@ -36,16 +34,6 @@ const Edit = () => {
                     <div className="overflow-hidden bg-white shadow-sm sm:rounded-lg dark:bg-gray-800">
                         <div className="p-6 text-gray-900 dark:text-gray-100">
                             <form onSubmit={submit}>
-                                <div className="mb-4">
-                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-400">Nombre de paniers</label>
-                                    <input
-                                        type="number"
-                                        value={data.nbpanier}
-                                        onChange={(e) => setData("nbpanier", e.target.value)}
-                                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300"
-                                    />
-                                    <span className="text-red-500 text-xs">{errors.nbpanier}</span>
-                                </div>
                                 <div className="mb-4">
                                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-400">Date Prévu</label>
                                     <input

@@ -13,7 +13,7 @@ const [isAnimating, setIsAnimating] = useState(true);
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 1 }}
-            className="h-screen flex flex-col justify-between bg-cover bg-center bg-green-600"
+        className="h-screen flex flex-col justify-between bg-cover bg-center bg-[#018A3A]"
             style={{ backgroundImage: "url(bgc.jpg)" }}
             onAnimationComplete={() => setIsAnimating(false)} // When the animation ends
         >

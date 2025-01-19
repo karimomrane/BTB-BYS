@@ -60,6 +60,28 @@ const Edit = () => {
                                 </div>
 
                                 <div className="mb-4">
+                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-400">Mot de passe</label>
+                                    <input
+                                        type="password"
+                                        value={data.password}
+                                        onChange={(e) => setData("password", e.target.value)}
+                                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300"
+                                    />
+                                    <span className="text-red-500 text-xs">{errors.password}</span>
+                                </div>
+
+                                <div className="mb-4">
+                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-400">Confirmation du mot de passe</label>
+                                    <input
+                                        type="password"
+                                        value={data.password_confirmation}
+                                        onChange={(e) => setData("password_confirmation", e.target.value)}
+                                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300"
+                                    />
+                                    <span className="text-red-500 text-xs">{errors.password_confirmation}</span>
+                                </div>
+
+                                <div className="mb-4">
                                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-400">Téléphone</label>
                                     <input
                                         type="text"

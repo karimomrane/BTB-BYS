@@ -48,12 +48,7 @@ export default function Navbar() {
                             >
                                 Liste Commandes
                             </NavLink>
-                            <NavLink
-                                href={route('commandes.create')}
-                                active={route().current('commandes.create')}
-                            >
-                                Nouvelle Commande
-                            </NavLink>
+
                             {user.role === 'admin' && (
                                 <NavLink
                                     href={route('users.index')}
@@ -64,12 +59,22 @@ export default function Navbar() {
                             )}
                             {user.role === 'admin' && (
                                 <NavLink
-                                    href={route('users.create')}
-                                    active={route().current('users.create')}
+                                    href={route('articles.index')}
+                                    active={route().current('articles.index')}
                                 >
-                                    Ajouter Utilisateur
+                                    Articles
                                 </NavLink>
                             )}
+
+                            {user.role === 'admin' && (
+                                <NavLink
+                                    href={route('paniers.index')}
+                                    active={route().current('paniers.index')}
+                                >
+                                    Paniers
+                                </NavLink>
+                            )}
+
 
                         </div>
                     </div>
@@ -137,25 +142,25 @@ export default function Navbar() {
                     </div>
 
                     <div className="-me-2 flex items-center sm:hidden">
-                         {/* Dark Mode Toggle */}
-                         <div
-                                onClick={() => setIsDarkMode((prev) => !prev)}
-                                className={`mr-5 flex h-[35px] w-[70px] rounded-[50px] bg-zinc-100 p-[3px] shadow-inner hover:cursor-pointer dark:bg-zinc-700 ${isDarkMode && 'place-content-end'}`}
+                        {/* Dark Mode Toggle */}
+                        <div
+                            onClick={() => setIsDarkMode((prev) => !prev)}
+                            className={`mr-5 flex h-[35px] w-[70px] rounded-[50px] bg-zinc-100 p-[3px] shadow-inner hover:cursor-pointer dark:bg-zinc-700 ${isDarkMode && 'place-content-end'}`}
+                        >
+                            <motion.div
+                                className="flex h-[28px] w-[28px] items-center justify-center rounded-full bg-black/90"
+                                layout
+                                transition={spring}
                             >
-                                <motion.div
-                                    className="flex h-[28px] w-[28px] items-center justify-center rounded-full bg-black/90"
-                                    layout
-                                    transition={spring}
-                                >
-                                    <motion.div whileTap={{ rotate: 360 }}>
-                                        {isDarkMode ? (
-                                            <FaSun className="h-5 w-5 text-yellow-300" />
-                                        ) : (
-                                            <FaMoon className="h-5 w-5 text-slate-200" />
-                                        )}
-                                    </motion.div>
+                                <motion.div whileTap={{ rotate: 360 }}>
+                                    {isDarkMode ? (
+                                        <FaSun className="h-5 w-5 text-yellow-300" />
+                                    ) : (
+                                        <FaMoon className="h-5 w-5 text-slate-200" />
+                                    )}
                                 </motion.div>
-                            </div>
+                            </motion.div>
+                        </div>
                         <button
                             onClick={() =>
                                 setShowingNavigationDropdown(
