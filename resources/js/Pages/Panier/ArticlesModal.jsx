@@ -91,7 +91,7 @@ const ArticlesModal = ({ panier: initialPanier, onClose }) => {
                 initial={{ scale: 0.8 }}
                 animate={{ scale: 1 }}
                 exit={{ scale: 0.8 }}
-                className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg max-w-auto w-full"
+                className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg max-w-auto w-[90%] max-h-[90%] overflow-y-auto"
                 onClick={(e) => e.stopPropagation()}
             >
                 <h2 className="text-xl font-semibold mb-4 dark:text-gray-200">Articles in {panier.name}</h2>
@@ -105,9 +105,9 @@ const ArticlesModal = ({ panier: initialPanier, onClose }) => {
                                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400">
                                     Nom
                                 </th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400">
+                                {/* <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400">
                                     Description
-                                </th>
+                                </th> */}
                                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400">
                                     Quantité
                                 </th>
@@ -117,12 +117,12 @@ const ArticlesModal = ({ panier: initialPanier, onClose }) => {
                                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400">
                                     Image
                                 </th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400">
+                                {/* <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400">
                                     Extra
                                 </th>
                                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400">
                                     Prét
-                                </th>
+                                </th> */}
                                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400">
                                     Actions
                                 </th>
@@ -140,9 +140,9 @@ const ArticlesModal = ({ panier: initialPanier, onClose }) => {
                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
                                         {article.name}
                                     </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                                    {/* <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
                                         {article.description}
-                                    </td>
+                                    </td> */}
                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
                                         {article.pivot.quantity}
                                     </td>
@@ -160,8 +160,8 @@ const ArticlesModal = ({ panier: initialPanier, onClose }) => {
                                             <span className="text-gray-500">Aucune image</span>
                                         )}
                                     </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                                        {/* Switch for Extra */}
+                                    {/* <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+
                                         <label className="switch">
                                             <input
                                                 type="checkbox"
@@ -174,7 +174,6 @@ const ArticlesModal = ({ panier: initialPanier, onClose }) => {
                                         </label>
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                                        {/* Switch for Ready */}
                                         <label className="switch">
                                             <input
                                                 type="checkbox"
@@ -185,7 +184,9 @@ const ArticlesModal = ({ panier: initialPanier, onClose }) => {
                                             />
                                             <span className="slider round"></span>
                                         </label>
-                                    </td>
+                                    </td> */}
+
+
                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
                                         <button
                                             onClick={() => handleDeleteArticle(article.id)}
@@ -197,15 +198,15 @@ const ArticlesModal = ({ panier: initialPanier, onClose }) => {
                                 </tr>
                             ))}
                             <tr className="bg-gray-50 dark:bg-gray-700">
-                                <td colSpan={6} className="bg-gray-100 dark:bg-gray-900 px-6 py-4 whitespace-nowrap text-center text-sm text-gray-900 dark:text-gray-100">
+                                <td colSpan={4} className="bg-gray-100 dark:bg-gray-900 px-6 py-4 whitespace-nowrap text-center text-sm text-gray-900 dark:text-gray-100">
                                     <span className="font-semibold">Totals :</span>
                                 </td>
-                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                                {/* <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
                                     <span className="font-semibold">Total Non-Extra:</span> {totalNonExtra.toFixed(2)} DT
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
                                     <span className="font-semibold">Total Extra:</span> {totalExtra.toFixed(2)} DT
-                                </td>
+                                </td> */}
                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
                                     <span className="font-semibold">Total:</span> {grandTotal.toFixed(2)} DT
                                 </td>

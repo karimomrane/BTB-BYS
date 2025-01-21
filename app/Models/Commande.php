@@ -24,4 +24,9 @@ class Commande extends Model
         return $this->belongsToMany(Panier::class, 'panier_commandes')
             ->withPivot('quantity'); // Include quantity in the pivot table
     }
+    public function articles(): BelongsToMany
+    {
+        return $this->belongsToMany(Article::class, 'articles_commandes')
+            ->withPivot('quantity'); // Include quantity in the pivot table
+    }
 }

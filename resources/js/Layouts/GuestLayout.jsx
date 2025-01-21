@@ -23,10 +23,10 @@ export default function GuestLayout({ children }) {
                     initial={{ y: 50, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
                     transition={{ duration: 0.8, delay: 0.6 }}
-                    className="absolute bottom-0 w-full bg-gray-200 bg-opacity-10 py-4 text-center text-white text-sm"
+                    className="absolute bottom-0 w-full bg-gray-200 bg-opacity-0 py-4 text-center text-white text-sm"
                 >
                     <p>
-                        © 2025 <a href="#" className="hover:text-indigo-400">Karim Omrane</a>. All Rights Reserved.
+                        © 2025 <a href="#" className="hover:text-indigo-400">Equipe IT Ben YaghlaneShops</a>. All Rights Reserved.
                     </p>
                 </motion.footer>
             </div>

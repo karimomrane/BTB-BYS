@@ -1,10 +1,10 @@
-// pages/Commandes/Index.jsx
 import React, { useEffect, useState } from "react";
+import { Head, usePage, router } from "@inertiajs/react";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
-import { Head, usePage } from "@inertiajs/react";
 import toast, { Toaster } from "react-hot-toast";
 import CommandeTable from "./CommandeTable";
 import NavLink from "@/Components/NavLink";
+import Pagination from "@/Components/Pagination";
 
 // Define status styles as a constant
 const STATUS_STYLES = {
@@ -20,9 +20,12 @@ const STATUS_STYLES = {
 // Define table headers as constants
 const COMMANDES_HEADERS = ["ID", "Date Prévu", "Status", "Créé par", "Créé le", "Action"];
 const PANIER_COMMANDES_HEADERS = ["ID", "Panier", "Commande", "Quantité", "Actions"];
-const Index = ({ commandes, panierCommandes, status }) => {
+const Index = ({ commandes, panierCommandes, articleCommandes, status, filters }) => {
     const user = usePage().props.auth.user;
     const [selectedCommande, setSelectedCommande] = useState(null);
+    const [startDate, setStartDate] = useState(filters.start_date || "");
+    const [endDate, setEndDate] = useState(filters.end_date || "");
+    console.log(commandes);
 
 
     useEffect(() => {
@@ -39,6 +42,23 @@ const Index = ({ commandes, panierCommandes, status }) => {
         }
     };
 
+
+    const handleFilter = (e) => {
+        e.preventDefault();
+        router.get(route('commandes.index'), { start_date: startDate, end_date: endDate }, {
+            preserveState: true,
+            replace: true,
+        });
+    };
+
+    const resetFilter = () => {
+        setStartDate("");
+        setEndDate("");
+        router.get(route('commandes.index'), {}, {
+            preserveState: true,
+            replace: true,
+        });
+    };
 
     return (
         <AuthenticatedLayout
@@ -68,11 +88,56 @@ const Index = ({ commandes, panierCommandes, status }) => {
             <Toaster />
             <div className="py-12">
                 <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
+                    {/* Date Filter Form */}
+                    <div className="mb-6 p-4 bg-white shadow-sm sm:rounded-lg dark:bg-gray-800">
+                        <form onSubmit={handleFilter} className="flex gap-4 items-end">
+                            <div>
+                                <label htmlFor="start_date" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                    Date de début
+                                </label>
+                                <input
+                                    type="date"
+                                    id="start_date"
+                                    value={startDate}
+                                    onChange={(e) => setStartDate(e.target.value)}
+                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100"
+                                />
+                            </div>
+                            <div>
+                                <label htmlFor="end_date" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                    Date de fin
+                                </label>
+                                <input
+                                    type="date"
+                                    id="end_date"
+                                    value={endDate}
+                                    onChange={(e) => setEndDate(e.target.value)}
+                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100"
+                                />
+                            </div>
+                            <button
+                                type="submit"
+                                className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700"
+                            >
+                                Filtrer
+                            </button>
+                            <button
+                                type="button"
+                                onClick={resetFilter}
+                                className="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700"
+                            >
+                                Réinitialiser
+                            </button>
+                        </form>
+                    </div>
+
+                    {/* Commande Table */}
                     <div className="overflow-hidden bg-white shadow-sm sm:rounded-lg dark:bg-gray-800">
                         <div className="p-6 text-gray-900 dark:text-gray-100">
                             <CommandeTable
                                 commandes={commandes}
                                 panierCommandes={panierCommandes}
+                                articleCommandes={articleCommandes}
                                 selectedCommande={selectedCommande}
                                 handleCommandeClick={handleCommandeClick}
                                 user={user}
@@ -83,8 +148,15 @@ const Index = ({ commandes, panierCommandes, status }) => {
                                     Aucune commande disponible.
                                 </div>
                             )}
+                            {/* Pagination */}
+                            {commandes.links && (
+                                <Pagination links={commandes.links} className="mt-6" />
+                            )}
                         </div>
+
                     </div>
+
+
                 </div>
             </div>
         </AuthenticatedLayout>

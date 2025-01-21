@@ -1,166 +1,210 @@
-export const generateCommandePDF = async (commande, panierCommandes, calculateTotal) => {
-    // Dynamically import pdfmake
-    const pdfMake = await import("pdfmake/build/pdfmake");
-    const pdfFonts = await import("pdfmake/build/vfs_fonts");
+import { PDFDownloadLink, Document, Page, Text, View, StyleSheet, Image, pdf } from '@react-pdf/renderer';
 
-    // Register the fonts
-    pdfMake.vfs = pdfFonts.pdfMake.vfs;
+// Define styles for the PDF
+const styles = StyleSheet.create({
+  page: {
+    padding: 40,
+    fontFamily: 'Helvetica',
+    backgroundColor: '#FFFFFF',
+  },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 30,
+    paddingBottom: 20,
+  },
+  logo: {
+    width: 80,
+    height: 80,
+  },
+  companyInfo: {
+    fontSize: 10,
+    color: '#333333',
+    textAlign: 'right',
+    lineHeight: 1.5,
+  },
+  invoiceTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#000000',
+    textAlign: 'center',
+    marginBottom: 30,
+  },
+  clientInfo: {
+    fontSize: 10,
+    fontWeight: 'bold',
+    color: '#555555',
+    marginBottom: 10,
+    paddingBottom: 5,
+  },
+  sectionHeader: {
+    fontSize: 12,
+    color: '#000000',
+    marginBottom: 5,
+    lineHeight: 1.5,
+  },
+  table: {
+    width: '100%',
+    borderWidth: 1,
+    borderColor: '#555555',
+    marginBottom: 20,
+  },
+  tableHeader: {
+    fontSize: 8,
+    padding: 8,
+    flex: 1,
+    color: '#555555',
+    textAlign: 'center',
+    borderRightWidth: 1,
+    borderRightColor: '#555555',
+  },
+  tableRow: {
+    flexDirection: 'row',
+    borderBottomWidth: 1,
+    borderBottomColor: '#555555',
+  },
+  tableCell: {
+    fontSize: 8,
+    padding: 8,
+    flex: 1,
+    color: '#555555',
+    textAlign: 'center',
+    borderRightWidth: 1,
+    borderRightColor: '#555555',
+  },
+  lastCell: {
+    borderRightWidth: 0, // Remove right border for the last cell in a row
+  },
+  totalSection: {
+    marginTop: 20,
+    padding: 15,
+    backgroundColor: '#F5F5F5',
+    borderRadius: 5,
+  },
+  totalText: {
+    fontSize: 12,
+    color: '#555555',
+    textAlign: 'right',
+    marginBottom: 5,
+  },
+  totalTextBold: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: '#000000',
+    textAlign: 'right',
+  },
+  footer: {
+    marginTop: 30,
+    paddingTop: 10,
+    borderTopWidth: 1,
+    borderTopColor: '#DDDDDD',
+    textAlign: 'center',
+  },
+  footerText: {
+    fontSize: 10,
+    color: '#777777',
+    lineHeight: 1.5,
+  },
+});
 
-    // Define the document content
-    const documentDefinition = {
-        content: [
-            // Header with logo and company info
-            {
-                columns: [
-                    {
-                        image: "logo", // Replace with your logo path
-                        width: 50,
-                        height: 50,
-                        alignment: "left",
-                    },
-                    {
-                        stack: [
-                            { text: "STE CENTRALE COMMERCIALE", style: "companyInfo" },
-                            { text: "123 OUED ELLIL, MANOUBA", style: "companyInfo" },
-                            { text: "MANOUBA, TUNIS, 2036", style: "companyInfo" },
-                            { text: "Phone: +216 29 613 714", style: "companyInfo" },
-                            { text: "Email: info@benyaghlaneshops.com", style: "companyInfo" },
-                        ],
-                        alignment: "right",
-                    },
-                ],
-                margin: [0, 0, 0, 20], // Add margin below the header
-            },
+// Create the PDF content
+const CommandePDF = ({ commande, panierCommandes, articleCommandes, total }) => (
+  <Document>
+    <Page style={styles.page}>
+      {/* Header with logo and company info */}
+      <View style={styles.header}>
+        <Image src="/logo.png" style={styles.logo} /> {/* Replace with your logo path */}
+        <View style={styles.companyInfo}>
+          <Text>STE CENTRALE COMMERCIALE</Text>
+          <Text>123 OUED ELLIL, MANOUBA</Text>
+          <Text>MANOUBA, TUNIS, 2036</Text>
+          <Text>Phone: +216 29 613 714</Text>
+          <Text>Email: info@benyaghlaneshops.com</Text>
+        </View>
+      </View>
 
-            // Invoice title
-            {
-                text: `Bon de Commande N° ${commande.id}`,
-                style: "invoiceTitle",
-                margin: [0, 0, 0, 10], // Add margin below the title
-            },
+      {/* Invoice title */}
+      <Text style={styles.invoiceTitle}>Bon de Commande N° {commande.id}</Text>
 
-            // Client information
-            {
-                text: "Informations du Client",
-                style: "sectionHeader",
-                margin: [0, 0, 0, 10], // Add margin below the section header
-            },
-            {
-                columns: [
-                    {
-                        stack: [
-                            { text: `Nom: ${commande.user.name}`, style: "clientInfo" },
-                            { text: `Email: ${commande.user.email}`, style: "clientInfo" },
-                            { text: `Date de Commande: ${new Date(commande.created_at).toLocaleDateString("fr-FR")}`, style: "clientInfo" },
-                            { text: `Date Prévue: ${commande.date}`, style: "clientInfo" },
-                        ],
-                        width: "*",
-                    },
-                ],
-                margin: [0, 0, 0, 20], // Add margin below the client info
-            },
+      {/* Client information */}
+      <Text style={styles.sectionHeader}>Informations du Client : </Text>
+      <View style={{ marginBottom: 20 }}>
+        <Text style={styles.clientInfo}>Nom: {commande.user.name}</Text>
+        <Text style={styles.clientInfo}>Email: {commande.user.email}</Text>
+        <Text style={styles.clientInfo}>
+          Date de Commande: {new Date(commande.created_at).toLocaleDateString('fr-FR')}
+        </Text>
+        <Text style={styles.clientInfo}>Date Prévue: {commande.date}</Text>
+      </View>
 
-            // Commande details table
-            {
-                text: "Détails de la Commande",
-                style: "sectionHeader",
-                margin: [0, 0, 0, 10], // Add margin below the section header
-            },
-            {
-                table: {
-                    headerRows: 1,
-                    widths: ["*", "auto", "auto", "auto"], // Column widths
-                    body: [
-                        // Table headers
-                        [
-                            { text: "Produit", style: "tableHeader" },
-                            { text: "Quantité", style: "tableHeader" },
-                            { text: "Prix Unitaire", style: "tableHeader" },
-                            { text: "Total", style: "tableHeader" },
-                        ],
-                        // Table rows
-                        ...panierCommandes
-                            .filter((pc) => pc.commande_id === commande.id)
-                            .map((pc) => [
-                                pc.panier?.name || "N/A",
-                                pc.quantity,
-                                `${(pc.panier?.price || 0).toFixed(2)} DT`,
-                                `${((pc.panier?.price || 0) * pc.quantity).toFixed(2)} DT`,
-                            ]),
-                    ],
-                },
-                layout: "lightHorizontalLines", // Table styling
-                margin: [0, 0, 0, 20], // Add margin below the table
-            },
+      {/* Panier table */}
+      <Text style={styles.sectionHeader}>Détails des Paniers :</Text>
+      <View style={styles.table}>
+        {/* Table Header */}
+        <View style={styles.tableRow}>
+          <Text style={[styles.tableHeader, styles.lastCell]}>Produit</Text>
+          <Text style={[styles.tableHeader, styles.lastCell]}>Quantité</Text>
+          <Text style={[styles.tableHeader, styles.lastCell]}>Prix Unitaire</Text>
+          <Text style={[styles.tableHeader, styles.lastCell]}>Total</Text>
+        </View>
+        {/* Table Rows */}
+        {panierCommandes
+          .filter((pc) => pc.commande_id === commande.id)
+          .map((pc, index) => (
+            <View key={index} style={styles.tableRow}>
+              <Text style={[styles.tableCell, styles.lastCell]}>{pc.panier?.name || 'N/A'}</Text>
+              <Text style={[styles.tableCell, styles.lastCell]}>{pc.quantity}</Text>
+              <Text style={[styles.tableCell, styles.lastCell]}>{(pc.panier?.price || 0).toFixed(2)} DT</Text>
+              <Text style={[styles.tableCell, styles.lastCell]}>{((pc.panier?.price || 0) * pc.quantity).toFixed(2)} DT</Text>
+            </View>
+          ))}
+      </View>
 
-            // Total section
-            {
-                stack: [
-                    { text: `Sous-Total: ${calculateTotal(commande.id).toFixed(2)} DT`, style: "totalText" },
-                    { text: `TVA 0%: 0 DT`, style: "totalText" },
-                    { text: `Total: ${calculateTotal(commande.id).toFixed(2)} DT`, style: "totalTextBold" },
-                ],
-                margin: [0, 0, 0, 20], // Add margin below the total section
-            },
+      {/* Extra articles table */}
+      <Text style={styles.sectionHeader}>Articles Supplémentaires :</Text>
+      <View style={styles.table}>
+        {/* Table Header */}
+        <View style={styles.tableRow}>
+          <Text style={[styles.tableHeader, styles.lastCell]}>Article</Text>
+          <Text style={[styles.tableHeader, styles.lastCell]}>Quantité</Text>
+          <Text style={[styles.tableHeader, styles.lastCell]}>Prix Unitaire</Text>
+          <Text style={[styles.tableHeader, styles.lastCell]}>Total</Text>
+        </View>
+        {/* Table Rows */}
+        {articleCommandes
+          .filter((ac) => ac.commande_id === commande.id)
+          .map((ac, index) => (
+            <View key={index} style={styles.tableRow}>
+              <Text style={[styles.tableCell, styles.lastCell]}>{ac.article?.name || 'N/A'}</Text>
+              <Text style={[styles.tableCell, styles.lastCell]}>{ac.quantity}</Text>
+              <Text style={[styles.tableCell, styles.lastCell]}>{(ac.article?.price || 0).toFixed(2)} DT</Text>
+              <Text style={[styles.tableCell, styles.lastCell]}>{((ac.article?.price || 0) * ac.quantity).toFixed(2)} DT</Text>
+            </View>
+          ))}
+      </View>
 
-            // Footer
-            {
-                text: [
-                    { text: "Merci pour votre confiance !\n", style: "footerText" },
-                    { text: "Pour toute question, contactez-nous à info@benyaghlaneshops.com.", style: "footerText" },
-                ],
-                alignment: "center",
-                margin: [0, 0, 0, 10], // Add margin below the footer
-            },
-        ],
+      {/* Total section */}
+      <View style={styles.totalSection}>
+        <Text style={styles.totalText}>Sous-Total : {total.toFixed(2)} DT</Text>
+        <Text style={styles.totalText}>TVA 0% : 0 DT</Text>
+        <Text style={styles.totalTextBold}>Total : {total.toFixed(2)} DT</Text>
+      </View>
 
-        // Styles for the document
-        styles: {
-            companyInfo: {
-                fontSize: 9,
-                color: "#666666", // Gray color
-                margin: [0, 0, 0, 5], // Add margin below each line
-            },
-            invoiceTitle: {
-                fontSize: 18,
-                bold: true,
-                alignment: "center",
-            },
-            sectionHeader: {
-                fontSize: 14,
-                bold: true,
-                margin: [0, 0, 0, 10], // Add margin below the header
-            },
-            clientInfo: {
-                fontSize: 10,
-                color: "#666666", // Gray color
-                margin: [0, 0, 0, 5], // Add margin below each line
-            },
-            tableHeader: {
-                fontSize: 12,
-                bold: true,
-                fillColor: "#808080", // Gray background
-                color: "#FFFFFF", // White text
-                alignment: "center",
-            },
-            totalText: {
-                fontSize: 10,
-                alignment: "right",
-                margin: [0, 0, 0, 5], // Add margin below each line
-            },
-            totalTextBold: {
-                fontSize: 14,
-                bold: true,
-                alignment: "right",
-            },
-            footerText: {
-                fontSize: 10,
-                color: "#666666", // Gray color
-                alignment: "center",
-            },
-        },
-    };
+      {/* Footer */}
+      <View style={styles.footer}>
+        <Text style={styles.footerText}>
+          Merci pour votre confiance !{'\n'}
+          Pour toute question, contactez-nous à info@benyaghlaneshops.com.
+        </Text>
+      </View>
+    </Page>
+  </Document>
+);
 
-    // Generate and download the PDF
-    pdfMake.createPdf(documentDefinition).download(`Commande_${commande.id}.pdf`);
+// Function to generate and download the PDF
+export const generateCommandePDF = async (commande, panierCommandes, articleCommandes, total) => {
+  const pdfBlob = await pdf(<CommandePDF commande={commande} panierCommandes={panierCommandes} articleCommandes={articleCommandes} total={total} />).toBlob();
+  const url = URL.createObjectURL(pdfBlob);
+  return url;
 };

@@ -3,18 +3,25 @@ import { Head, useForm } from "@inertiajs/react";
 import { AnimatePresence, motion } from "framer-motion";
 import React, { useState } from "react";
 import toast, { Toaster } from "react-hot-toast";
+import ExtraArticlesSection from "./ExtraArticlesSection";
+import PanierSelectionSection from "./PanierSelectionSection";
 
-const Add = ({ paniers }) => {
+const Add = ({ paniers, articles }) => {
     const [selectedPaniers, setSelectedPaniers] = useState([]);
     const [panierQuantities, setPanierQuantities] = useState({}); // Track quantity for each panier
     const [showProducts, setShowProducts] = useState(false);
+    const [showExtraArticles, setShowExtraArticles] = useState(false);
+    const [selectedExtraArticles, setSelectedExtraArticles] = useState([]);
+    const [extraArticleQuantities, setExtraArticleQuantities] = useState({}); // Track quantity for each extra article
 
     const { data, setData, post, errors, processing } = useForm({
         date: "",
         description: "",
         paniers: [], // Array to store selected panier IDs and quantities
+        articles_commandes: [], // Array to store selected extra articles and quantities
     });
 
+    // Handle panier selection
     const handlePanierSelection = (panierId) => {
         setSelectedPaniers((prev) => {
             let updatedPaniers;
@@ -63,18 +70,80 @@ const Add = ({ paniers }) => {
         });
     };
 
+    // Handle extra article selection
+    const handleExtraArticleSelection = (articleId) => {
+        setSelectedExtraArticles((prev) => {
+            let updatedArticles;
+            if (prev.includes(articleId)) {
+                // Deselect article
+                updatedArticles = prev.filter((id) => id !== articleId);
+                const updatedQuantities = { ...extraArticleQuantities };
+                delete updatedQuantities[articleId]; // Remove quantity for deselected article
+                setExtraArticleQuantities(updatedQuantities);
+            } else {
+                // Select article
+                updatedArticles = [...prev, articleId];
+                setExtraArticleQuantities((prevQuantities) => ({
+                    ...prevQuantities,
+                    [articleId]: 1, // Default quantity to 1
+                }));
+            }
+
+            // Update the `data` object with the new articles and quantities
+            const articlesData = updatedArticles.map((id) => ({
+                article_id: id,
+                quantity: extraArticleQuantities[id] || 1,
+            }));
+            setData("articles_commandes", articlesData);
+
+            return updatedArticles;
+        });
+    };
+
+    // Handle quantity change for an extra article
+    const handleExtraArticleQuantityChange = (articleId, quantity) => {
+        setExtraArticleQuantities((prevQuantities) => {
+            const updatedQuantities = {
+                ...prevQuantities,
+                [articleId]: quantity,
+            };
+
+            // Update the `data` object with the new quantities
+            const articlesData = selectedExtraArticles.map((id) => ({
+                article_id: id,
+                quantity: updatedQuantities[id] || 1,
+            }));
+            setData("articles_commandes", articlesData);
+
+            return updatedQuantities;
+        });
+    };
+
     // Calculate total price for a panier
     const calculatePanierTotal = (panier) => {
         const quantity = panierQuantities[panier.id] || 1;
         return panier.price * quantity;
     };
 
-    // Calculate grand total for all selected paniers
+    // Calculate total price for an extra article
+    const calculateExtraArticleTotal = (article) => {
+        const quantity = extraArticleQuantities[article.id] || 1;
+        return article.price * quantity;
+    };
+
+    // Calculate grand total for all selected paniers and extra articles
     const calculateGrandTotal = () => {
-        return selectedPaniers.reduce((total, panierId) => {
+        const paniersTotal = selectedPaniers.reduce((total, panierId) => {
             const panier = paniers.find((p) => p.id === panierId);
             return total + calculatePanierTotal(panier);
         }, 0);
+
+        const articlesTotal = selectedExtraArticles.reduce((total, articleId) => {
+            const article = articles.find((a) => a.id === articleId);
+            return total + calculateExtraArticleTotal(article);
+        }, 0);
+
+        return paniersTotal + articlesTotal;
     };
 
     // Handle form submission
@@ -84,15 +153,23 @@ const Add = ({ paniers }) => {
         // Prepare paniers data with quantities
         const paniersData = selectedPaniers.map((panierId) => ({
             panier_id: panierId,
-            quantity: panierQuantities[panierId] || 1, // Default to 1 if quantity is not set
+            quantity: panierQuantities[panierId] || 1,
+        }));
+
+        // Prepare extra articles data with quantities
+        const articlesData = selectedExtraArticles.map((articleId) => ({
+            article_id: articleId,
+            quantity: extraArticleQuantities[articleId] || 1,
         }));
 
         // Update form data
         setData("paniers", paniersData);
+        setData("articles_commandes", articlesData);
 
         // Submit the form
         post(route("commandes.store"), {
             onSuccess: () => {
+
             },
             onError: () => {
                 toast.error("Une erreur s'est produite lors de la création de la commande.");
@@ -117,69 +194,19 @@ const Add = ({ paniers }) => {
                 className="py-5"
             >
                 <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
-                    {/* Panier Selection Section with Background Image */}
-                    <motion.div
-                        initial={{ y: -50, opacity: 0 }}
-                        animate={{ y: 0, opacity: 1 }}
-                        transition={{ duration: 0.5 }}
-                        className="relative overflow-hidden bg-cover bg-center h-64 rounded-lg mb-8"
-                        style={{ backgroundImage: 'url(/cmdd.jpg)' }} // Replace with your image path
-                    >
-                        <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center p-6">
-                            <div className="w-full max-w-2xl">
-                                <button
-                                    onClick={() => setShowProducts((prev) => !prev)}
-                                    className="w-full text-left bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded-lg flex items-center justify-between"
-                                >
-                                    <span>Sélectionner des Paniers</span>
-                                    <motion.span
-                                        initial={{ rotate: 0 }}
-                                        animate={{ rotate: showProducts ? 180 : 0 }}
-                                        transition={{ duration: 0.3 }}
-                                        className="ml-2 transform"
-                                    >
-                                        ▼
-                                    </motion.span>
-                                </button>
-                                <AnimatePresence>
-                                    {showProducts && (
-                                        <motion.div
-                                            initial={{ opacity: 0, height: 0 }}
-                                            animate={{ opacity: 1, height: 'auto' }}
-                                            exit={{ opacity: 0, height: 0 }}
-                                            transition={{ duration: 0.2 }}
-                                            className="mt-4 space-y-4"
-                                        >
-                                            {paniers.map((panier) => (
-                                                <motion.div
-                                                    key={panier.id}
-                                                    initial={{ x: -20, opacity: 0 }}
-                                                    animate={{ x: 0, opacity: 1 }}
-                                                    transition={{ duration: 0.3 }}
-                                                    className="flex items-center justify-between p-3 bg-white rounded-lg shadow-sm hover:bg-indigo-50 dark:bg-gray-800 dark:hover:bg-gray-700"
-                                                >
-                                                    <div className="flex items-center space-x-4">
-                                                        <input
-                                                            type="checkbox"
-                                                            checked={selectedPaniers.includes(panier.id)}
-                                                            onChange={() => handlePanierSelection(panier.id)}
-                                                            className="form-checkbox h-5 w-5 text-indigo-600 rounded focus:ring-indigo-500 dark:focus:ring-indigo-400"
-                                                        />
-                                                        <span className="font-medium text-indigo-600 dark:text-indigo-400">
-                                                            {panier.name}
-                                                        </span>
-                                                    </div>
-                                                    <span className="text-sm text-gray-600 dark:text-gray-300">
-                                                        {panier.price} DT
-                                                    </span>
-                                                </motion.div>
-                                            ))}
-                                        </motion.div>
-                                    )}
-                                </AnimatePresence>
-                            </div>
-                        </div>
-                    </motion.div>
+                    {/* Panier Selection Section */}
+                    <PanierSelectionSection
+                        paniers={paniers}
+                        selectedPaniers={selectedPaniers}
+                        handlePanierSelection={handlePanierSelection}
+                    />
+
+                    {/* Extra Articles Selection Section */}
+                    <ExtraArticlesSection
+                        articles={articles}
+                        selectedExtraArticles={selectedExtraArticles}
+                        handleExtraArticleSelection={handleExtraArticleSelection}
+                    />
 
                     {/* Create Commande Form Section */}
                     <motion.div
@@ -190,6 +217,7 @@ const Add = ({ paniers }) => {
                     >
                         <div className="p-6 text-gray-900 dark:text-gray-100">
                             <form onSubmit={submit}>
+                                {/* Date and Description Fields */}
                                 <div className="mb-4">
                                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-400">
                                         Date Prévu
@@ -220,7 +248,7 @@ const Add = ({ paniers }) => {
                                 {selectedPaniers.length > 0 && (
                                     <div className="mb-4">
                                         <label className="block text-sm font-medium text-gray-700 dark:text-gray-400">
-                                            Détails de la Commande
+                                            Détails des Paniers
                                         </label>
                                         <div className="mt-2">
                                             <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
@@ -305,14 +333,74 @@ const Add = ({ paniers }) => {
                                                 </tbody>
                                             </table>
                                         </div>
-                                        <div className="mt-4 text-right">
-                                            <p className="text-lg font-semibold text-gray-900 dark:text-gray-100">
-                                                Total: {calculateGrandTotal()} DT
-                                            </p>
+                                    </div>
+                                )}
+
+                                {/* Display Selected Extra Articles and Quantity Input */}
+                                {selectedExtraArticles.length > 0 && (
+                                    <div className="mb-4">
+                                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-400">
+                                            Détails des Articles Supplémentaires
+                                        </label>
+                                        <div className="mt-2">
+                                            <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                                                <thead className="bg-gray-50 dark:bg-gray-900">
+                                                    <tr>
+                                                        <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400">
+                                                            Article
+                                                        </th>
+                                                        <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400">
+                                                            Prix Unitaire
+                                                        </th>
+                                                        <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400">
+                                                            Quantité
+                                                        </th>
+                                                        <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400">
+                                                            Total
+                                                        </th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody className="bg-white divide-y divide-gray-200 dark:bg-gray-800 dark:divide-gray-700">
+                                                    {articles
+                                                        .filter((article) => selectedExtraArticles.includes(article.id))
+                                                        .map((article) => (
+                                                            <tr key={article.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
+                                                                <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                                                                    {article.name}
+                                                                </td>
+                                                                <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                                                                    {article.price} DT
+                                                                </td>
+                                                                <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                                                                    <input
+                                                                        type="number"
+                                                                        value={extraArticleQuantities[article.id] || 1}
+                                                                        onChange={(e) =>
+                                                                            handleExtraArticleQuantityChange(article.id, parseInt(e.target.value))
+                                                                        }
+                                                                        min="1"
+                                                                        className="w-20 rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300"
+                                                                    />
+                                                                </td>
+                                                                <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                                                                    {calculateExtraArticleTotal(article)} DT
+                                                                </td>
+                                                            </tr>
+                                                        ))}
+                                                </tbody>
+                                            </table>
                                         </div>
                                     </div>
                                 )}
 
+                                {/* Grand Total */}
+                                <div className="mt-4 text-right">
+                                    <p className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                                        Total: {calculateGrandTotal()} DT
+                                    </p>
+                                </div>
+
+                                {/* Submit Button */}
                                 <motion.button
                                     whileHover={{ scale: 1.05 }}
                                     whileTap={{ scale: 0.95 }}

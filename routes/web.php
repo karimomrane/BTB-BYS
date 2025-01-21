@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ArticleController;
 use App\Http\Controllers\ArticlePanierController;
+use App\Http\Controllers\ArticlesCommandeController;
 use App\Http\Controllers\CommandeController;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\HomeController;
@@ -40,7 +41,7 @@ Route::middleware('auth')->group(function () {
     Route::patch('/paniers/{panier}/articles/{article}', [ArticlePanierController::class, 'update'])
     ->name('article_paniers.update');
 
-
+    Route::resource('articles_commande', ArticlesCommandeController::class);
 
     Route::resource('panier_commandes', PanierCommandeController::class);
 

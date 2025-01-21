@@ -98,7 +98,7 @@ const [isAnimating, setIsAnimating] = useState(true);
                 className="w-full bg-gray-200 bg-opacity-0 py-4 text-center text-white text-sm"
             >
                 <p>
-                    © 2025 <a href="#" className="hover:text-white">Karim Omrane</a>. All Rights Reserved.
+                    © 2025 <a href="#" className="hover:text-white">Equipe IT Ben YaghlaneShops</a>. All Rights Reserved.
                 </p>
             </motion.footer>
         </motion.div>

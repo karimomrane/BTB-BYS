@@ -13,6 +13,7 @@ class Article extends Model
         'description',
         'price',
         'image',
+        'is_extra',
     ];
 
     public function paniers(): BelongsToMany

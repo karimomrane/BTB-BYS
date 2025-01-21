@@ -2,14 +2,33 @@ import React from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Link } from "@inertiajs/react";
 import CommandeDetails from "./CommandeDetails";
+import { FaEdit, FaTrash } from "react-icons/fa";
 
-const CommandeTable = ({ commandes, selectedCommande, panierCommandes, handleCommandeClick, user, STATUS_STYLES }) => {
-    // Calculate the total for a commande
+const CommandeTable = ({
+    commandes,
+    selectedCommande,
+    panierCommandes,
+    articleCommandes, // Add articleCommandes prop
+    handleCommandeClick,
+    user,
+    STATUS_STYLES,
+}) => {
+    // Calculate the total for a commande (including paniers and extra articles)
     const calculateTotal = (commandeId) => {
+        // Calculate total for paniers
         const associatedPaniers = panierCommandes.filter((pc) => pc.commande_id === commandeId);
-        return associatedPaniers.reduce((total, pc) => {
+        const paniersTotal = associatedPaniers.reduce((total, pc) => {
             return total + (pc.panier?.price || 0) * pc.quantity;
         }, 0);
+
+        // Calculate total for extra articles
+        const associatedArticles = articleCommandes.filter((ac) => ac.commande_id === commandeId);
+        const articlesTotal = associatedArticles.reduce((total, ac) => {
+            return total + (ac.article?.price || 0) * ac.quantity;
+        }, 0);
+
+        // Return the combined total
+        return paniersTotal + articlesTotal;
     };
 
     return (
@@ -18,25 +37,28 @@ const CommandeTable = ({ commandes, selectedCommande, panierCommandes, handleCom
             <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                 <thead className="bg-gray-50 dark:bg-gray-900">
                     <tr>
-                        {["ID", "Date Prévu", "Status", "Créé par", "Créé le", "Total", user.role === "admin" && "Action"].filter(Boolean).map((header) => (
-                            <th
-                                key={header}
-                                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400"
-                            >
-                                {header}
-                            </th>
-                        ))}
+                        {["ID", "Date Prévu", "Status", "Créé par", "Créé le", "Total", user.role === "admin" && "Action"]
+                            .filter(Boolean)
+                            .map((header) => (
+                                <th
+                                    key={header}
+                                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400"
+                                >
+                                    {header}
+                                </th>
+                            ))}
                     </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200 dark:bg-gray-800 dark:divide-gray-700">
-                    {commandes.length > 0 ? (
-                        commandes.map((commande) => (
+                    {commandes.data.length > 0 ? (
+                        commandes.data.map((commande) => (
                             <React.Fragment key={commande.id}>
-                                <tr
-                                    className="hover:bg-gray-50 dark:hover:bg-gray-700"
-                                >
-                                    <td onClick={() => handleCommandeClick(commande)} className="cursor-pointer px-6 py-4 underline hover:text-indigo-600 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                                       N°{commande.id}
+                                <tr className="hover:bg-gray-50 dark:hover:bg-gray-700">
+                                    <td
+                                        onClick={() => handleCommandeClick(commande)}
+                                        className="cursor-pointer px-6 py-4 underline hover:text-indigo-600 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100"
+                                    >
+                                        N°{commande.id}
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
                                         {commande.date}
@@ -63,7 +85,7 @@ const CommandeTable = ({ commandes, selectedCommande, panierCommandes, handleCom
                                                 href={route("commandes.edit", commande.id)}
                                                 className="text-blue-600 hover:text-blue-900 dark:text-blue-500 dark:hover:text-blue-400 transition"
                                             >
-                                                Editer
+                                                <FaEdit />
                                             </Link>
                                             <Link
                                                 href={route("commandes.destroy", commande.id)}
@@ -72,7 +94,7 @@ const CommandeTable = ({ commandes, selectedCommande, panierCommandes, handleCom
                                                 type="button"
                                                 className="text-red-600 hover:text-red-900 dark:text-red-500 dark:hover:text-red-400 transition"
                                             >
-                                                Supprimer
+                                                <FaTrash/>
                                             </Link>
                                         </td>
                                     )}
@@ -93,6 +115,7 @@ const CommandeTable = ({ commandes, selectedCommande, panierCommandes, handleCom
                                                     <CommandeDetails
                                                         commande={commande}
                                                         panierCommandes={panierCommandes}
+                                                        articleCommandes={articleCommandes} // Pass articleCommandes
                                                         isOpen={selectedCommande?.id === commande.id}
                                                         onClose={() => handleCommandeClick(null)}
                                                     />
@@ -119,6 +142,7 @@ const CommandeTable = ({ commandes, selectedCommande, panierCommandes, handleCom
                     <CommandeDetails
                         commande={selectedCommande}
                         panierCommandes={panierCommandes}
+                        articleCommandes={articleCommandes} // Pass articleCommandes
                         isOpen={!!selectedCommande}
                         onClose={() => handleCommandeClick(null)}
                     />

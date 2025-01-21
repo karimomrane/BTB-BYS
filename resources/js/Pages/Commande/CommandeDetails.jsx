@@ -4,23 +4,49 @@ import PanierTable from "./PanierTable";
 import CModal from "@/Components/CModal";
 import { generateCommandePDF } from "./pdfUtils";
 
-const CommandeDetails = ({ commande, panierCommandes, isOpen, onClose }) => {
+const CommandeDetails = ({ commande, panierCommandes, articleCommandes, isOpen, onClose }) => {
     const user = usePage().props.auth.user;
 
-    // Calculate the total for a commande
+    // Calculate the total for a commande (including paniers and extra articles)
     const calculateTotal = (commandeId) => {
+        // Calculate total for paniers
         const associatedPaniers = panierCommandes.filter((pc) => pc.commande_id === commandeId);
-        return associatedPaniers.reduce((total, pc) => {
+        const paniersTotal = associatedPaniers.reduce((total, pc) => {
             return total + (pc.panier?.price || 0) * pc.quantity;
         }, 0);
+
+        // Calculate total for extra articles
+        const associatedArticles = articleCommandes.filter((ac) => ac.commande_id === commandeId);
+        const articlesTotal = associatedArticles.reduce((total, ac) => {
+            return total + (ac.article?.price || 0) * ac.quantity;
+        }, 0);
+
+        console.log('commandeId', commandeId);
+
+        console.log('articleCommandes', articleCommandes);
+
+        console.log('associatedArticles', associatedArticles);
+
+
+        // Return the combined total
+        return paniersTotal + articlesTotal;
     };
 
     // Calculate the total for the current commande
     const total = calculateTotal(commande.id).toFixed(2);
 
     // Handle PDF download
-    const handleDownloadPDF = () => {
-        generateCommandePDF(commande, panierCommandes, calculateTotal);
+    const handleDownloadPDF = async () => {
+        try {
+            const pdfUrl = await generateCommandePDF(commande, panierCommandes, articleCommandes, calculateTotal(commande.id));
+            const link = document.createElement('a');
+            link.href = pdfUrl;
+            link.download = `Commande_${commande.id}.pdf`;
+            link.click();
+        } catch (error) {
+            console.error('Failed to generate PDF:', error);
+            alert('Failed to generate PDF. Please try again.');
+        }
     };
 
     return (
@@ -100,6 +126,49 @@ const CommandeDetails = ({ commande, panierCommandes, isOpen, onClose }) => {
                 {/* Panier Table */}
                 <PanierTable panierCommandes={panierCommandes.filter((pc) => pc.commande_id === commande.id)} />
 
+                {/* Extra Articles Table */}
+                <div className="mb-6">
+                    <h3 className="text-lg font-semibold mb-2">Articles Supplémentaires</h3>
+                    <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                        <thead className="bg-gray-50 dark:bg-gray-900">
+                            <tr>
+                                <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400">
+                                    Article
+                                </th>
+                                <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400">
+                                    Quantité
+                                </th>
+                                <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400">
+                                    Prix Unitaire
+                                </th>
+                                <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400">
+                                    Total
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody className="bg-white divide-y divide-gray-200 dark:bg-gray-800 dark:divide-gray-700">
+                            {articleCommandes
+                                .filter((ac) => ac.commande_id === commande.id)
+                                .map((ac) => (
+                                    <tr key={ac.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
+                                        <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                                            {ac.article?.name}
+                                        </td>
+                                        <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                                            {ac.quantity}
+                                        </td>
+                                        <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                                            {ac.article?.price} DT
+                                        </td>
+                                        <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                                            {(ac.article?.price || 0) * ac.quantity} DT
+                                        </td>
+                                    </tr>
+                                ))}
+                        </tbody>
+                    </table>
+                </div>
+
                 {/* Total Section */}
                 <div className="mt-6 flex justify-end">
                     <div className="text-right">
@@ -116,7 +185,7 @@ const CommandeDetails = ({ commande, panierCommandes, isOpen, onClose }) => {
                 </div>
 
                 {/* Download PDF Button */}
-                {user.role === 'admin' && (
+                {user.role === "admin" && (
                     <div className="mt-6 flex justify-end">
                         <button
                             onClick={handleDownloadPDF}

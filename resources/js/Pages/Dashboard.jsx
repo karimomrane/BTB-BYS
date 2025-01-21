@@ -1,9 +1,9 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, usePage } from '@inertiajs/react';
-import { FaUsers, FaClipboardList, FaTruck } from 'react-icons/fa';
+import { FaUsers, FaClipboardList, FaTruck, FaChartLine } from 'react-icons/fa';
 import { motion } from 'framer-motion';
 
-export default function Dashboard({ comliv, uc, users, commandes }) {
+export default function Dashboard({ totalRevenue, totalRevenuePrevu, comliv, uc, users, commandes }) {
     const user = usePage().props.auth.user;
 
     // Animation variants for cards
@@ -99,6 +99,47 @@ export default function Dashboard({ comliv, uc, users, commandes }) {
                         </p>
                     </div>
                 </motion.div>
+                {/*Revenue*/}
+                <motion.div
+                    className="flex items-center rounded-lg bg-white p-6 shadow-lg dark:bg-gray-800"
+                    variants={cardVariants}
+                >
+                    <div className="mr-4 flex items-center justify-center h-12 w-12 rounded-full bg-purple-100 dark:bg-purple-900">
+                        <FaChartLine
+                            className="text-purple-500 dark:text-purple-400"
+                            aria-label="Revenue Icon"
+                        />
+                    </div>
+                    <div>
+                        <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200">
+                            Revenu Total (Payé)
+                        </h3>
+                        <p className="text-gray-600 dark:text-gray-400">
+                            {totalRevenue} DT
+                        </p>
+                    </div>
+                </motion.div>
+                 {/*Revenue prevu*/}
+                 <motion.div
+                    className="flex items-center rounded-lg bg-white p-6 shadow-lg dark:bg-gray-800"
+                    variants={cardVariants}
+                >
+                    <div className="mr-4 flex items-center justify-center h-12 w-12 rounded-full bg-green-100 dark:bg-green-900">
+                        <FaChartLine
+                            className="text-green-500 dark:text-green-400"
+                            aria-label="Revenue Icon"
+                        />
+                    </div>
+                    <div>
+                        <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200">
+                            Revenu Total Prévu (Payé + Livré)
+                        </h3>
+                        <p className="text-gray-600 dark:text-gray-400">
+                            {totalRevenue+totalRevenuePrevu} DT
+                        </p>
+                    </div>
+                </motion.div>
+
             </motion.div>
 
             {/* Ranking Table */}
@@ -110,13 +151,13 @@ export default function Dashboard({ comliv, uc, users, commandes }) {
             >
                 <div className="rounded-lg bg-white p-6 shadow-lg dark:bg-gray-800">
                     <h3 className="mb-4 text-lg font-semibold text-gray-800 dark:text-gray-200">
-                        Classement des utilisateurs par commandes
+                        Classement des utilisateurs
                     </h3>
                     <div className="overflow-x-auto">
                         <table className="w-full table-auto border-separate border-spacing-0">
                             <thead className='bg-gray-50 dark:bg-gray-900'>
                                 <tr>
-                                    {["Rang", "Nom", "Email", "Nombre de Commandes"]
+                                    {["Rang", "Nom", "Email", "Commandes Validé", "Total Revenu"]
                                         .filter(Boolean)
                                         .map((header) => (
                                             <th
@@ -130,7 +171,7 @@ export default function Dashboard({ comliv, uc, users, commandes }) {
                             </thead>
                             <tbody className="bg-white divide-y divide-gray-200 dark:bg-gray-800 dark:divide-gray-700">
                                 {uc
-                                    .sort((a, b) => b.commandes_count - a.commandes_count)
+                                    .sort((a, b) => b.total_revenue - a.total_revenue)
                                     .map((user, index) => (
                                         <motion.tr
                                             key={user.id}
@@ -150,6 +191,9 @@ export default function Dashboard({ comliv, uc, users, commandes }) {
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
                                                 {user.commandes_count}
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                                                {user.total_revenue} DT
                                             </td>
                                         </motion.tr>
                                     ))}

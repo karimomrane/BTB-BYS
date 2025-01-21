@@ -1,6 +1,7 @@
 import NavLink from "@/Components/NavLink";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Head, Link, usePage } from "@inertiajs/react";
+import { FaEdit } from "react-icons/fa";
 
 const Index = ({ users }) => {
     const user = usePage().props.auth.user;
@@ -74,7 +75,7 @@ const Index = ({ users }) => {
                                                         href={route("users.edit", user.id)}
                                                         className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-500"
                                                     >
-                                                        Modifier
+                                                        <FaEdit />
                                                     </Link>
                                                 </td>
                                             </tr>
