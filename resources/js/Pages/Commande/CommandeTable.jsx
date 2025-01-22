@@ -51,7 +51,7 @@ const CommandeTable = ({
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200 dark:bg-gray-800 dark:divide-gray-700">
                     {commandes.data.length > 0 ? (
-                        commandes.data.map((commande) => (
+                        commandes.data.sort((a, b) => new Date(b.created_at) - new Date(a.created_at)).map((commande) => (
                             <React.Fragment key={commande.id}>
                                 <tr className="hover:bg-gray-50 dark:hover:bg-gray-700">
                                     <td
