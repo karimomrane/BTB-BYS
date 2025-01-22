@@ -23,8 +23,10 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Vite::prefetch(concurrency: 3);
+
         Schema::defaultStringLength(191);
         if (env('APP_ENV') === 'prod') {
+            $this->app['request']->server->set('HTTPS', 'on');
             URL::forceScheme('https');
         }
     }
