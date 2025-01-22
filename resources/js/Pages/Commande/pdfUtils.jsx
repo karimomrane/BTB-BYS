@@ -1,9 +1,18 @@
 import { PDFDownloadLink, Document, Page, Text, View, StyleSheet, Image, pdf } from '@react-pdf/renderer';
 
+const truncateText = (text, maxLength) => {
+    if (text.length > maxLength) {
+        return text.substring(0, maxLength) + '...';
+    }
+    return text;
+};
 // Define styles for the PDF
 const styles = StyleSheet.create({
     page: {
-        padding: 40,
+        paddingRight: 20,
+        paddingLeft: 20,
+        paddingTop: 20,
+        paddingBottom: 50,
         fontFamily: 'Helvetica',
         backgroundColor: '#FFFFFF',
     },
@@ -11,7 +20,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        marginBottom: 30,
+        marginBottom: 20,
         paddingBottom: 20,
     },
     logo: {
@@ -44,9 +53,19 @@ const styles = StyleSheet.create({
         marginBottom: 5,
         lineHeight: 1.5,
     },
+    sectionHeaderA: {
+        fontSize: 8,
+        color: '#111111',
+        marginBottom: 5,
+        lineHeight: 1.5,
+    },
     table: {
         width: '100%',
+        marginBottom: 20,
         borderWidth: 1,
+    },
+    tableA: {
+        width: '100%',
         borderColor: '#555555',
         marginBottom: 20,
     },
@@ -54,37 +73,39 @@ const styles = StyleSheet.create({
         fontSize: 8,
         padding: 8,
         flex: 1,
-        color: '#555555',
+        color: '#000000',
+        backgroundColor: '#bbbbbb',
         textAlign: 'center',
         borderRightWidth: 1,
         borderRightColor: '#555555',
     },
     tableRow: {
         flexDirection: 'row',
-        borderBottomWidth: 1,
-        borderBottomColor: '#555555',
+    },
+    tableRowA: {
+        flexDirection: 'row',
     },
     tableCell: {
         fontSize: 8,
-        padding: 8,
+        paddingTop: 8,
+        paddingBottom: 8,
         flex: 1,
         color: '#555555',
         textAlign: 'center',
-        borderRightWidth: 1,
         borderRightColor: '#555555',
+        borderWidth: 1,
+        borderLeftWidth: 0,
+        borderTopWidth: 0,
     },
     tableCellA: {
-        fontSize: 8,
-        padding: 5,
+        fontSize: 7,
+        paddingTop: 5,
+        paddingBottom: 5,
         flex: 1,
         color: '#555555',
         textAlign: 'center',
-        borderRightWidth: 1,
-        borderRightColor: '#555555',
     },
-    lastCell: {
-        borderRightWidth: 0, // Remove right border for the last cell in a row
-    },
+
     totalSection: {
         marginTop: 20,
         padding: 15,
@@ -116,9 +137,9 @@ const styles = StyleSheet.create({
         lineHeight: 1.5,
     },
     nestedTable: {
-        marginLeft: 10,
-        marginRight: 10,
-        marginTop: 10,
+        marginLeft: 5,
+        marginRight: 5,
+        marginTop: 5,
         marginBottom: 10,
     },
 });
@@ -154,74 +175,79 @@ const CommandePDF = ({ commande, panierCommandes, articleCommandes, total }) => 
             </View>
 
             {/* Panier table */}
-            <Text style={styles.sectionHeader}>Détails des Paniers :</Text>
-            <View style={styles.table}>
-                {/* Table Header */}
-                <View style={styles.tableRow}>
-                    <Text style={[styles.tableHeader, styles.lastCell]}>Produit</Text>
-                    <Text style={[styles.tableHeader, styles.lastCell]}>Quantité</Text>
-                    <Text style={[styles.tableHeader, styles.lastCell]}>Prix Unitaire</Text>
-                    <Text style={[styles.tableHeader, styles.lastCell]}>Total</Text>
-                </View>
-                {/* Table Rows */}
-                {panierCommandes
-                    .filter((pc) => pc.commande_id === commande.id)
-                    .map((pc, index) => (
-                        <View key={index}>
-                            <View style={styles.tableRow}>
-                                <Text style={[styles.tableCell, styles.lastCell]}>{pc.panier?.name || 'N/A'}</Text>
-                                <Text style={[styles.tableCell, styles.lastCell]}>{pc.quantity}</Text>
-                                <Text style={[styles.tableCell, styles.lastCell]}>{(pc.panier?.price || 0).toFixed(2)} DT</Text>
-                                <Text style={[styles.tableCell, styles.lastCell]}>{((pc.panier?.price || 0) * pc.quantity).toFixed(2)} DT</Text>
-                            </View>
-                            {/* Nested table for articles */}
-                            <View style={styles.nestedTable}>
-                                <Text style={styles.sectionHeader}>Articles dans ce Panier :</Text>
-                                <View style={styles.table}>
-                                    {/* Table Rows */}
-                                    {pc.panier.articles
-                                        .map((ac, index) => (
-                                            <View key={index} style={styles.tableRow}>
-                                                <Text style={[styles.tableCellA, styles.lastCell]}>{ac.name || 'N/A'}</Text>
-                                                <Text style={[styles.tableCellA, styles.lastCell]}>{ac.pivot.quantity * pc.quantity}</Text>
-                                                <Text style={[styles.tableCellA, styles.lastCell]}>{(ac.price || 0).toFixed(2)} DT</Text>
-                                                <Text style={[styles.tableCellA, styles.lastCell]}>{((ac.price || 0) * (ac.pivot.quantity * pc.quantity)).toFixed(2)} DT</Text>
-                                            </View>
-                                        ))}
+            <View > {/* Ensure the entire panier table stays together */}
+                <Text style={styles.sectionHeader}>Détails des Paniers :</Text>
+                <View style={styles.table}>
+                    {/* Table Header */}
+                    <View style={styles.tableRow}>
+                        <Text style={[styles.tableHeader]}>Produit</Text>
+                        <Text style={[styles.tableHeader]}>Quantité</Text>
+                        <Text style={[styles.tableHeader]}>Prix Unitaire</Text>
+                        <Text style={[styles.tableHeader]}>Total</Text>
+                    </View>
+                    {/* Table Rows */}
+                    {panierCommandes
+                        .filter((pc) => pc.commande_id === commande.id)
+                        .map((pc, index) => (
+                            <View key={index} >
+                                <View style={styles.tableRow}>
+                                    <Text wrap={false} style={[styles.tableCell]}>{pc.panier?.name || 'N/A'}</Text>
+                                    <Text wrap={false} style={[styles.tableCell]}>{pc.quantity}</Text>wrap={false}
+                                    <Text wrap={false} style={[styles.tableCell]}>{(pc.panier?.price || 0).toFixed(2)} DT</Text>wrap={false}
+                                    <Text wrap={false} style={[styles.tableCell]}>{((pc.panier?.price || 0) * pc.quantity).toFixed(2)} DT</Text>
+                                </View>
+                                {/* Nested table for articles */}
+                                <View style={styles.nestedTable}>
+                                    <View style={styles.tableA}>
+                                        {/* Table Rows */}
+                                        {pc.panier.articles
+                                            .map((ac, index) => (
+                                                <View key={index} style={styles.tableRowA}>
+                                                    <Text wrap={false} style={[styles.tableCellA]}>{truncateText(ac.name || 'N/A', 26)}</Text>
+                                                    <Text wrap={false} style={[styles.tableCellA]}>{ac.pivot.quantity * pc.quantity}</Text>
+                                                    <Text wrap={false} style={[styles.tableCellA]}>{(ac.price || 0).toFixed(2)} DT</Text>
+                                                    <Text wrap={false} style={[styles.tableCellA]}>{((ac.price || 0) * (ac.pivot.quantity * pc.quantity)).toFixed(2)} DT</Text>
+                                                </View>
+                                            ))}
+                                    </View>
                                 </View>
                             </View>
-                        </View>
-                    ))}
+                        ))}
+                </View>
             </View>
 
             {/* Extra articles table */}
-            <Text style={styles.sectionHeader}>Articles Supplémentaires :</Text>
-            <View style={styles.table}>
-                {/* Table Header */}
-                <View style={styles.tableRow}>
-                    <Text style={[styles.tableHeader, styles.lastCell]}>Article</Text>
-                    <Text style={[styles.tableHeader, styles.lastCell]}>Quantité</Text>
-                    <Text style={[styles.tableHeader, styles.lastCell]}>Prix Unitaire</Text>
-                    <Text style={[styles.tableHeader, styles.lastCell]}>Total</Text>
+            <View> {/* Ensure the entire extra articles table stays together */}
+                <Text style={styles.sectionHeader}>Articles Supplémentaires :</Text>
+                <View style={styles.table}>
+                    {/* Table Header */}
+                    <View style={styles.tableRow}>
+                        <Text style={[styles.tableHeader]}>Article</Text>
+                        <Text style={[styles.tableHeader]}>Quantité</Text>
+                        <Text style={[styles.tableHeader]}>Prix Unitaire</Text>
+                        <Text style={[styles.tableHeader]}>Total</Text>
+                    </View>
+                    {/* Table Rows */}
+                    {articleCommandes
+                        .filter((ac) => ac.commande_id === commande.id && !ac.panier_id)
+                        .map((ac, index) => (
+                            <View key={index} style={styles.tableRow}>
+                                <Text wrap={false} style={[styles.tableCell]}>{truncateText(ac.article?.name || 'N/A', 26)}</Text>
+                                <Text wrap={false} style={[styles.tableCell]}>{ac.quantity}</Text>
+                                <Text wrap={false} style={[styles.tableCell]}>{(ac.article?.price || 0).toFixed(2)} DT</Text>
+                                <Text wrap={false} style={[styles.tableCell]}>{((ac.article?.price || 0) * ac.quantity).toFixed(2)} DT</Text>
+                            </View>
+                        ))}
                 </View>
-                {/* Table Rows */}
-                {articleCommandes
-                    .filter((ac) => ac.commande_id === commande.id && !ac.panier_id)
-                    .map((ac, index) => (
-                        <View key={index} style={styles.tableRow}>
-                            <Text style={[styles.tableCell, styles.lastCell]}>{ac.article?.name || 'N/A'}</Text>
-                            <Text style={[styles.tableCell, styles.lastCell]}>{ac.quantity}</Text>
-                            <Text style={[styles.tableCell, styles.lastCell]}>{(ac.article?.price || 0).toFixed(2)} DT</Text>
-                            <Text style={[styles.tableCell, styles.lastCell]}>{((ac.article?.price || 0) * ac.quantity).toFixed(2)} DT</Text>
-                        </View>
-                    ))}
             </View>
 
             {/* Total section */}
-            <View style={styles.totalSection}>
-                <Text style={styles.totalText}>Sous-Total : {total.toFixed(2)} DT</Text>
-                <Text style={styles.totalText}>TVA 0% : 0 DT</Text>
-                <Text style={styles.totalTextBold}>Total : {total.toFixed(2)} DT</Text>
+            <View wrap={false}> {/* Ensure the total section stays together */}
+                <View style={styles.totalSection}>
+                    <Text style={styles.totalText}>Sous-Total : {total.toFixed(2)} DT</Text>
+                    <Text style={styles.totalText}>TVA 0% : 0 DT</Text>
+                    <Text style={styles.totalTextBold}>Total : {total.toFixed(2)} DT</Text>
+                </View>
             </View>
 
             {/* Footer */}
