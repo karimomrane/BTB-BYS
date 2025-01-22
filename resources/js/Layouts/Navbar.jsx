@@ -6,6 +6,7 @@ import { Link, usePage } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
 import { motion, spring } from 'framer-motion';
 import { FaSun, FaMoon } from 'react-icons/fa';
+
 export default function Navbar() {
     const user = usePage().props.auth.user;
     const [showingNavigationDropdown, setShowingNavigationDropdown] = useState(false);
@@ -22,10 +23,12 @@ export default function Navbar() {
             localStorage.setItem('theme', 'light');
         }
     }, [isDarkMode]);
+
     return (
         <nav className="border-b border-gray-100 bg-white dark:border-gray-700 dark:bg-gray-800">
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                 <div className="flex h-16 justify-between">
+                    {/* Logo and Desktop Navigation */}
                     <div className="flex">
                         <div className="flex shrink-0 items-center">
                             <Link href="/">
@@ -74,11 +77,10 @@ export default function Navbar() {
                                     Paniers
                                 </NavLink>
                             )}
-
-
                         </div>
                     </div>
 
+                    {/* Desktop User Dropdown and Dark Mode Toggle */}
                     <div className="hidden sm:ms-6 sm:flex sm:items-center">
                         <div className="relative ms-3 flex items-center space-x-4">
                             {/* Dark Mode Toggle */}
@@ -100,7 +102,6 @@ export default function Navbar() {
                                     </motion.div>
                                 </motion.div>
                             </div>
-
 
                             {/* User Dropdown */}
                             <Dropdown>
@@ -141,6 +142,7 @@ export default function Navbar() {
                         </div>
                     </div>
 
+                    {/* Mobile Menu Toggle */}
                     <div className="-me-2 flex items-center sm:hidden">
                         {/* Dark Mode Toggle */}
                         <div
@@ -203,31 +205,29 @@ export default function Navbar() {
                 </div>
             </div>
 
+            {/* Mobile Navigation Menu */}
             <div
                 className={
                     (showingNavigationDropdown ? 'block' : 'hidden') +
                     ' sm:hidden'
                 }
             >
-                <div className="space-y-1 pb-3 pt-2 sm:hidden">
-                    <ResponsiveNavLink
-                        href={route('dashboard')}
-                        active={route().current('dashboard')}
-                    >
-                        Dashboard
-                    </ResponsiveNavLink>
+                <div className="space-y-1 pb-3 pt-2">
+                    {user.role === 'admin' && (
+                        <ResponsiveNavLink
+                            href={route('dashboard')}
+                            active={route().current('dashboard')}
+                        >
+                            Tableau de board
+                        </ResponsiveNavLink>
+                    )}
                     <ResponsiveNavLink
                         href={route('commandes.index')}
                         active={route().current('commandes.index')}
                     >
                         Liste Commandes
                     </ResponsiveNavLink>
-                    <ResponsiveNavLink
-                        href={route('commandes.create')}
-                        active={route().current('commandes.create')}
-                    >
-                        Nouvelle Commande
-                    </ResponsiveNavLink>
+
                     {user.role === 'admin' && (
                         <ResponsiveNavLink
                             href={route('users.index')}
@@ -238,15 +238,24 @@ export default function Navbar() {
                     )}
                     {user.role === 'admin' && (
                         <ResponsiveNavLink
-                            href={route('users.create')}
-                            active={route().current('users.create')}
+                            href={route('articles.index')}
+                            active={route().current('articles.index')}
                         >
-                            Ajouter Utilisateur
+                            Articles
+                        </ResponsiveNavLink>
+                    )}
+
+                    {user.role === 'admin' && (
+                        <ResponsiveNavLink
+                            href={route('paniers.index')}
+                            active={route().current('paniers.index')}
+                        >
+                            Paniers
                         </ResponsiveNavLink>
                     )}
                 </div>
 
-
+                {/* Mobile User Dropdown */}
                 <div className="border-t border-gray-200 pb-1 pt-4 dark:border-gray-600">
                     <div className="px-4">
                         <div className="text-base font-medium text-gray-800 dark:text-gray-200">
