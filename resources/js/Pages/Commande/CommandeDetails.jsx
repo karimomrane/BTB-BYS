@@ -3,6 +3,7 @@ import { usePage } from "@inertiajs/react";
 import PanierTable from "./PanierTable";
 import CModal from "@/Components/CModal";
 import { generateCommandePDF } from "./pdfUtils";
+import { FaXmark } from "react-icons/fa6";
 
 const CommandeDetails = ({ commande, panierCommandes, articleCommandes, isOpen, onClose }) => {
     const user = usePage().props.auth.user;
@@ -21,11 +22,6 @@ const CommandeDetails = ({ commande, panierCommandes, articleCommandes, isOpen, 
             return total + (ac.article?.price || 0) * ac.quantity;
         }, 0);
 
-        console.log('commandeId', commandeId);
-
-        console.log('articleCommandes', articleCommandes);
-
-        console.log('associatedArticles', associatedArticles);
 
 
         // Return the combined total
@@ -51,29 +47,17 @@ const CommandeDetails = ({ commande, panierCommandes, articleCommandes, isOpen, 
 
     return (
         <CModal isOpen={isOpen} onClose={onClose}>
+            {/* Close Button */}
+            <div className="flex justify-end">
+                <button
+                    onClick={onClose}
+                    className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                >
+                    <FaXmark className="w-8 h-8 hover:text-red-600" />
+                </button>
+            </div>
             <div className="space-y-4 overflow-y-auto max-h-[550px]">
-                {/* Close Button */}
-                <div className="flex justify-end">
-                    <button
-                        onClick={onClose}
-                        className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
-                    >
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            className="h-6 w-6"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                        >
-                            <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M6 18L18 6M6 6l12 12"
-                            />
-                        </svg>
-                    </button>
-                </div>
+
 
                 {/* Invoice Header */}
                 <div className="flex justify-between items-center mb-6">

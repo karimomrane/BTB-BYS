@@ -45,7 +45,7 @@ const ArticlesModal = ({ panier: initialPanier, onClose }) => {
 
     // Handle toggling extra/ready fields
     const handleToggle = (articleId, field, value) => {
-        console.log(articleId, field, value);
+
 
         router.patch(route("article_paniers.update", { panier: panier.id, article: articleId }), {
             [field]: value ? 1 : 0,
@@ -73,7 +73,6 @@ const ArticlesModal = ({ panier: initialPanier, onClose }) => {
                 });
             },
             onError: (errors) => {
-                console.log("Erreur lors de la mise à jour:", errors);
                 toast.error("Une erreur s'est produite lors de la mise à jour.");
             },
         });

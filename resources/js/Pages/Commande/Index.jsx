@@ -25,7 +25,7 @@ const Index = ({ commandes, panierCommandes, articleCommandes, status, filters }
     const [selectedCommande, setSelectedCommande] = useState(null);
     const [startDate, setStartDate] = useState(filters.start_date || "");
     const [endDate, setEndDate] = useState(filters.end_date || "");
-    console.log(commandes);
+
 
 
     useEffect(() => {

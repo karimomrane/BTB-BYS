@@ -46,10 +46,6 @@ const Create = ({ articles, paniers }) => {
             formData.append(`articles[${index}][quantity]`, article.quantity);
         });
 
-        // Log FormData for debugging
-        for (let [key, value] of formData.entries()) {
-            console.log(key, value);
-        }
 
         post(route("article_paniers.store"), formData, {
             onSuccess: () => {
@@ -63,10 +59,7 @@ const Create = ({ articles, paniers }) => {
         });
     };
 
-    // Log form data for debugging
-    useEffect(() => {
-        console.log("Form Data:", data);
-    }, [data]);
+
 
     return (
         <AuthenticatedLayout
