@@ -21,15 +21,17 @@ class ArticleController extends Controller
         // Fetch articles with pagination, search, and extra filter
         $articles = Article::query()
             ->when($search, function ($query, $search) {
-                $query->where('name', 'like', "%{$search}%")
-                    ->orWhere('description', 'like', "%{$search}%");
+                $query->where(function ($query) use ($search) {
+                    $query->where('name', 'like', "%{$search}%")
+                        ->orWhere('description', 'like', "%{$search}%");
+                });
             })
-            ->when($isExtra !== null, function ($query) use ($isExtra) {
+            ->when(isset($isExtra), function ($query) use ($isExtra) {
                 $query->where('is_extra', $isExtra);
             })
             ->latest('id')
             ->paginate(10) // Paginate with 10 items per page
-            ->withQueryString(); // Preserve query parameters (e.g., search, is_extra) in pagination links
+            ->appends(request()->query()); // Preserve query parameters (e.g., search, is_extra) in pagination links
 
         // Return the articles to the Inertia React view
         return Inertia::render('Article/Index', [

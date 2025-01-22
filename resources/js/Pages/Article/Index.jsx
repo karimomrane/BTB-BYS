@@ -11,7 +11,7 @@ const Index = ({ articles, filters }) => {
     const user = usePage().props.auth.user;
     const [selectedImage, setSelectedImage] = useState(null); // State to track the selected image
     const [search, setSearch] = useState(filters.search || ""); // State for search input
-    const [isExtra, setIsExtra] = useState(filters.is_extra || ""); // State for extra filter
+    const [isExtra, setIsExtra] = useState(filters.is_extra || null); // State for extra filter
 
     // Show toast notification for status
     if (usePage().props.status) {
@@ -48,7 +48,8 @@ const Index = ({ articles, filters }) => {
     // Function to handle search
     const handleSearch = (e) => {
         setSearch(e.target.value);
-        router.get(route("articles.index"), { search: e.target.value, is_extra }, {
+
+        router.get(route("articles.index"), { search: e.target.value, is_extra: isExtra }, {
             preserveState: true,
             replace: true,
         });
@@ -56,8 +57,9 @@ const Index = ({ articles, filters }) => {
 
     // Function to handle extra filter
     const handleExtraFilter = (e) => {
-        setIsExtra(e.target.value);
-        router.get(route("articles.index"), { search, is_extra: e.target.value }, {
+        const value = e.target.value;
+        setIsExtra(value);
+        router.get(route("articles.index"), { search, is_extra: value }, {
             preserveState: true,
             replace: true,
         });
@@ -193,7 +195,7 @@ const Index = ({ articles, filters }) => {
                                                             type="button"
                                                             className="text-red-600 hover:text-red-900 dark:text-red-500 dark:hover:text-red-400 transition"
                                                         >
-                                                            <FaTrash/>
+                                                            <FaTrash />
                                                         </Link>
                                                     </td>
                                                 )}
