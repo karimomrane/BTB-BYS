@@ -45,7 +45,7 @@ class CommandeController extends Controller
         }
 
         // Paginate the results
-        $commandes = $query->paginate(10); // Adjust the number of items per page as needed
+        $commandes = $query->latest('id')->paginate(10); // Adjust the number of items per page as needed
 
         // Fetch related data
         $panierCommandes = Panier_Commande::with(['panier', 'panier.articles', 'commande'])->get();
