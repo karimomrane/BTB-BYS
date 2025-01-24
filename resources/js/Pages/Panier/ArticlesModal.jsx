@@ -1,14 +1,14 @@
 import { motion } from 'framer-motion';
-import { FaTimes } from "react-icons/fa"; // Import the X icon
-import { useForm } from "@inertiajs/react"; // Import useForm for delete and patch requests
+import { FaTimes } from "react-icons/fa";
+import { useForm } from "@inertiajs/react";
 import { router } from '@inertiajs/react';
-import { useState } from 'react'; // Import useState for local state management
+import { useState } from 'react';
 import './styles.css';
 import toast from 'react-hot-toast';
 
 const ArticlesModal = ({ panier: initialPanier, onClose }) => {
-    const { delete: deleteArticle } = useForm(); // Use Inertia's delete method
-    const [panier, setPanier] = useState(initialPanier); // Local state for panier
+    const { delete: deleteArticle } = useForm();
+    const [panier, setPanier] = useState(initialPanier);
 
     // Calculate totals based on quantity
     const totalNonExtra = panier.articles
@@ -29,7 +29,6 @@ const ArticlesModal = ({ panier: initialPanier, onClose }) => {
         if (confirm("Êtes-vous sûr de vouloir supprimer cet article du panier ?")) {
             deleteArticle(route("article_paniers.destroy", { panier: panier.id, article: articleId }), {
                 onSuccess: () => {
-                    // Update the local state by removing the deleted article
                     const updatedArticles = panier.articles.filter((article) => article.id !== articleId);
                     setPanier({
                         ...panier,
@@ -45,37 +44,34 @@ const ArticlesModal = ({ panier: initialPanier, onClose }) => {
 
     // Handle toggling extra/ready fields
     const handleToggle = (articleId, field, value) => {
-
-
-        router.patch(route("article_paniers.update", { panier: panier.id, article: articleId }), {
-            [field]: value ? 1 : 0,
-        }, {
-            onSuccess: () => {
-                toast.success(`Champ ${field} mis à jour avec succès!`);
-
-                // Update the local state
-                const updatedArticles = panier.articles.map((article) => {
-                    if (article.id === articleId) {
-                        return {
-                            ...article,
-                            pivot: {
-                                ...article.pivot,
-                                [field]: value ? 1 : 0, // Update the field
-                            },
-                        };
-                    }
-                    return article;
-                });
-
-                setPanier({
-                    ...panier,
-                    articles: updatedArticles, // Update the articles array
-                });
-            },
-            onError: (errors) => {
-                toast.error("Une erreur s'est produite lors de la mise à jour.");
-            },
-        });
+        router.patch(
+            route("article_paniers.update", { panier: panier.id, article: articleId }),
+            { [field]: value ? 1 : 0 },
+            {
+                onSuccess: () => {
+                    toast.success(`Champ ${field} mis à jour avec succès!`);
+                    const updatedArticles = panier.articles.map((article) => {
+                        if (article.id === articleId) {
+                            return {
+                                ...article,
+                                pivot: {
+                                    ...article.pivot,
+                                    [field]: value ? 1 : 0,
+                                },
+                            };
+                        }
+                        return article;
+                    });
+                    setPanier({
+                        ...panier,
+                        articles: updatedArticles,
+                    });
+                },
+                onError: () => {
+                    toast.error("Une erreur s'est produite lors de la mise à jour.");
+                },
+            }
+        );
     };
 
     return (
@@ -94,7 +90,9 @@ const ArticlesModal = ({ panier: initialPanier, onClose }) => {
                 onClick={(e) => e.stopPropagation()}
             >
                 <h2 className="text-xl font-semibold mb-4 dark:text-gray-200">Articles in {panier.name}</h2>
-                <div className="overflow-x-auto">
+
+                {/* Desktop Table */}
+                <div className="hidden md:block overflow-x-auto">
                     <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                         <thead className="bg-gray-50 dark:bg-gray-900">
                             <tr>
@@ -104,9 +102,6 @@ const ArticlesModal = ({ panier: initialPanier, onClose }) => {
                                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400">
                                     Nom
                                 </th>
-                                {/* <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400">
-                                    Description
-                                </th> */}
                                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400">
                                     Quantité
                                 </th>
@@ -116,12 +111,6 @@ const ArticlesModal = ({ panier: initialPanier, onClose }) => {
                                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400">
                                     Image
                                 </th>
-                                {/* <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400">
-                                    Extra
-                                </th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400">
-                                    Prét
-                                </th> */}
                                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400">
                                     Actions
                                 </th>
@@ -129,19 +118,13 @@ const ArticlesModal = ({ panier: initialPanier, onClose }) => {
                         </thead>
                         <tbody className="bg-white divide-y divide-gray-200 dark:bg-gray-800 dark:divide-gray-700">
                             {panier.articles.map((article) => (
-                                <tr
-                                    key={`${panier.id}-${article.id}`}
-                                    className="hover:bg-gray-50 dark:hover:bg-gray-700"
-                                >
+                                <tr key={`${panier.id}-${article.id}`} className="hover:bg-gray-50 dark:hover:bg-gray-700">
                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
                                         {article.id}
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
                                         {article.name}
                                     </td>
-                                    {/* <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                                        {article.description}
-                                    </td> */}
                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
                                         {article.pivot.quantity}
                                     </td>
@@ -159,39 +142,12 @@ const ArticlesModal = ({ panier: initialPanier, onClose }) => {
                                             <span className="text-gray-500">Aucune image</span>
                                         )}
                                     </td>
-                                    {/* <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-
-                                        <label className="switch">
-                                            <input
-                                                type="checkbox"
-                                                checked={article.pivot.extra === 1}
-                                                onChange={(e) =>
-                                                    handleToggle(article.id, "extra", e.target.checked)
-                                                }
-                                            />
-                                            <span className="slider round"></span>
-                                        </label>
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                                        <label className="switch">
-                                            <input
-                                                type="checkbox"
-                                                checked={article.pivot.ready === 1}
-                                                onChange={(e) =>
-                                                    handleToggle(article.id, "ready", e.target.checked)
-                                                }
-                                            />
-                                            <span className="slider round"></span>
-                                        </label>
-                                    </td> */}
-
-
                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
                                         <button
                                             onClick={() => handleDeleteArticle(article.id)}
                                             className="text-red-600 hover:text-red-900 dark:text-red-500 dark:hover:text-red-400 transition"
                                         >
-                                            <FaTimes /> {/* X icon */}
+                                            <FaTimes />
                                         </button>
                                     </td>
                                 </tr>
@@ -200,18 +156,55 @@ const ArticlesModal = ({ panier: initialPanier, onClose }) => {
                                 <td colSpan={4} className="bg-gray-100 dark:bg-gray-900 px-6 py-4 whitespace-nowrap text-center text-sm text-gray-900 dark:text-gray-100">
                                     <span className="font-semibold">Totals :</span>
                                 </td>
-                                {/* <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                                    <span className="font-semibold">Total Non-Extra:</span> {totalNonExtra.toFixed(2)} DT
-                                </td>
-                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                                    <span className="font-semibold">Total Extra:</span> {totalExtra.toFixed(2)} DT
-                                </td> */}
                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
                                     <span className="font-semibold">Total:</span> {grandTotal.toFixed(2)} DT
                                 </td>
                             </tr>
                         </tbody>
                     </table>
+                </div>
+
+                {/* Mobile List */}
+                <div className="md:hidden space-y-4">
+                    {panier.articles.map((article) => (
+                        <div key={`${panier.id}-${article.id}`} className="bg-white shadow-sm rounded-lg p-4 dark:bg-gray-700">
+                            <div className="space-y-2">
+                                <div className="flex justify-between items-center">
+                                    <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                                        ID: {article.id}
+                                    </span>
+                                    <span className="text-sm text-gray-500 dark:text-gray-400">
+                                        {article.price} DT
+                                    </span>
+                                </div>
+                                <div className="text-sm text-gray-900 dark:text-gray-100">
+                                    {article.name}
+                                </div>
+                                <div className="text-sm text-gray-500 dark:text-gray-400">
+                                    Quantité: {article.pivot.quantity}
+                                </div>
+                                <div className="text-sm text-gray-500 dark:text-gray-400">
+                                    {article.image ? (
+                                        <img
+                                            src={`/storage/${article.image}`}
+                                            alt={article.name}
+                                            className="w-10 h-10 rounded-full"
+                                        />
+                                    ) : (
+                                        <span className="text-gray-500">Aucune image</span>
+                                    )}
+                                </div>
+                                <div className="flex justify-end">
+                                    <button
+                                        onClick={() => handleDeleteArticle(article.id)}
+                                        className="text-red-600 hover:text-red-900 dark:text-red-500 dark:hover:text-red-400 transition"
+                                    >
+                                        <FaTimes />
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    ))}
                 </div>
 
                 {/* Summary List */}

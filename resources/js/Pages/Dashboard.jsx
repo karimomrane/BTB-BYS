@@ -119,8 +119,8 @@ export default function Dashboard({ totalRevenue, totalRevenuePrevu, comliv, uc,
                         </p>
                     </div>
                 </motion.div>
-                 {/*Revenue prevu*/}
-                 <motion.div
+                {/*Revenue prevu*/}
+                <motion.div
                     className="flex items-center rounded-lg bg-white p-6 shadow-lg dark:bg-gray-800"
                     variants={cardVariants}
                 >
@@ -135,7 +135,7 @@ export default function Dashboard({ totalRevenue, totalRevenuePrevu, comliv, uc,
                             Revenu Total Prévu (Payé + Livré)
                         </h3>
                         <p className="text-gray-600 dark:text-gray-400">
-                            {totalRevenue+totalRevenuePrevu} DT
+                            {totalRevenue + totalRevenuePrevu} DT
                         </p>
                     </div>
                 </motion.div>
@@ -153,9 +153,11 @@ export default function Dashboard({ totalRevenue, totalRevenuePrevu, comliv, uc,
                     <h3 className="mb-4 text-lg font-semibold text-gray-800 dark:text-gray-200">
                         Classement des utilisateurs
                     </h3>
-                    <div className="overflow-x-auto">
+
+                    {/* Desktop Table */}
+                    <div className="hidden md:block overflow-x-auto">
                         <table className="w-full table-auto border-separate border-spacing-0">
-                            <thead className='bg-gray-50 dark:bg-gray-900'>
+                            <thead className="bg-gray-50 dark:bg-gray-900">
                                 <tr>
                                     {["Rang", "Nom", "Email", "Commandes Validé", "Total Revenu"]
                                         .filter(Boolean)
@@ -199,6 +201,41 @@ export default function Dashboard({ totalRevenue, totalRevenuePrevu, comliv, uc,
                                     ))}
                             </tbody>
                         </table>
+                    </div>
+
+                    {/* Mobile List */}
+                    <div className="md:hidden space-y-4">
+                        {uc
+                            .sort((a, b) => b.total_revenue - a.total_revenue)
+                            .map((user, index) => (
+                                <motion.div
+                                    key={user.id}
+                                    className="bg-white shadow-sm rounded-lg p-4 dark:bg-gray-700"
+                                    initial={{ opacity: 0 }}
+                                    animate={{ opacity: 1 }}
+                                    transition={{ delay: index * 0.1, duration: 0.3 }}
+                                >
+                                    <div className="space-y-2">
+                                        <div className="flex justify-between items-center">
+                                            <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                                                Rang: {index + 1}
+                                            </span>
+                                            <span className="text-sm text-gray-500 dark:text-gray-400">
+                                                {user.total_revenue} DT
+                                            </span>
+                                        </div>
+                                        <div className="text-sm text-gray-900 dark:text-gray-100">
+                                            {user.name}
+                                        </div>
+                                        <div className="text-sm text-gray-500 dark:text-gray-400">
+                                            {user.email}
+                                        </div>
+                                        <div className="text-sm text-gray-500 dark:text-gray-400">
+                                            Commandes Validé: {user.commandes_count}
+                                        </div>
+                                    </div>
+                                </motion.div>
+                            ))}
                     </div>
                 </div>
             </motion.div>

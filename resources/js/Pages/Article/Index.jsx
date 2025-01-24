@@ -5,13 +5,13 @@ import toast, { Toaster } from "react-hot-toast";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
 import { FaEdit, FaTrash } from "react-icons/fa";
-import Pagination from "@/Components/Pagination"; // Import a custom Pagination component
+import Pagination from "@/Components/Pagination";
 
 const Index = ({ articles, filters }) => {
     const user = usePage().props.auth.user;
-    const [selectedImage, setSelectedImage] = useState(null); // State to track the selected image
-    const [search, setSearch] = useState(filters.search || ""); // State for search input
-    const [isExtra, setIsExtra] = useState(filters.is_extra || null); // State for extra filter
+    const [selectedImage, setSelectedImage] = useState(null);
+    const [search, setSearch] = useState(filters.search || "");
+    const [isExtra, setIsExtra] = useState(filters.is_extra || null);
 
     // Show toast notification for status
     if (usePage().props.status) {
@@ -32,37 +32,39 @@ const Index = ({ articles, filters }) => {
     const handleToggle = (article) => {
         const newIsExtraValue = !article.is_extra;
 
-        // Send a PATCH request to update the is_extra value
-        router.patch(route("articles.update", article.id), {
-            is_extra: newIsExtraValue,
-        }, {
-            onSuccess: () => {
-                toast.success("Statut mis à jour avec succès !");
-            },
-            onError: () => {
-                toast.error("Une erreur s'est produite lors de la mise à jour.");
-            },
-        });
+        router.patch(
+            route("articles.update", article.id),
+            { is_extra: newIsExtraValue },
+            {
+                onSuccess: () => {
+                    toast.success("Statut mis à jour avec succès !");
+                },
+                onError: () => {
+                    toast.error("Une erreur s'est produite lors de la mise à jour.");
+                },
+            }
+        );
     };
 
     // Function to handle search
     const handleSearch = (e) => {
         setSearch(e.target.value);
-
-        router.get(route("articles.index"), { search: e.target.value, is_extra: isExtra }, {
-            preserveState: true,
-            replace: true,
-        });
+        router.get(
+            route("articles.index"),
+            { search: e.target.value, is_extra: isExtra },
+            { preserveState: true, replace: true }
+        );
     };
 
     // Function to handle extra filter
     const handleExtraFilter = (e) => {
         const value = e.target.value;
         setIsExtra(value);
-        router.get(route("articles.index"), { search, is_extra: value }, {
-            preserveState: true,
-            replace: true,
-        });
+        router.get(
+            route("articles.index"),
+            { search, is_extra: value },
+            { preserveState: true, replace: true }
+        );
     };
 
     return (
@@ -88,7 +90,7 @@ const Index = ({ articles, filters }) => {
                     <div className="overflow-hidden bg-white shadow-sm sm:rounded-lg dark:bg-gray-800">
                         <div className="p-6 text-gray-900 dark:text-gray-100">
                             {/* Search and Filter Section */}
-                            <div className="mb-4 flex gap-4">
+                            <div className="mb-4 flex flex-col md:flex-row gap-4">
                                 {/* Search Input */}
                                 <input
                                     type="text"
@@ -102,7 +104,7 @@ const Index = ({ articles, filters }) => {
                                 <select
                                     value={isExtra}
                                     onChange={handleExtraFilter}
-                                    className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100"
+                                    className="w-full md:w-auto px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100"
                                 >
                                     <option value="">Tous les articles</option>
                                     <option value="1">Articles supplémentaires</option>
@@ -110,7 +112,8 @@ const Index = ({ articles, filters }) => {
                                 </select>
                             </div>
 
-                            <div className="overflow-x-auto">
+                            {/* Desktop Table */}
+                            <div className="hidden md:block overflow-x-auto">
                                 <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                                     <thead className="bg-gray-50 dark:bg-gray-900">
                                         <tr>
@@ -203,6 +206,75 @@ const Index = ({ articles, filters }) => {
                                         ))}
                                     </tbody>
                                 </table>
+                            </div>
+
+                            {/* Mobile List */}
+                            <div className="md:hidden space-y-4">
+                                {articles.data.map((article) => (
+                                    <div
+                                        key={article.id}
+                                        className="bg-white shadow-sm rounded-lg p-4 dark:bg-gray-700"
+                                    >
+                                        <div className="space-y-2">
+                                            <div className="flex justify-between items-center">
+                                                <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                                                    ID: {article.id}
+                                                </span>
+                                                <span className="text-sm text-gray-500 dark:text-gray-400">
+                                                    {article.price} DT
+                                                </span>
+                                            </div>
+                                            <div className="text-sm text-gray-900 dark:text-gray-100">
+                                                {article.name}
+                                            </div>
+                                            <div className="text-sm text-gray-500 dark:text-gray-400">
+                                                {article.description}
+                                            </div>
+                                            <div className="text-sm text-gray-500 dark:text-gray-400">
+                                                {article.image ? (
+                                                    <button
+                                                        onClick={() => openImage(`/storage/${article.image}`)}
+                                                        className="text-blue-600 hover:text-blue-900 dark:text-blue-500 dark:hover:text-blue-400 transition"
+                                                    >
+                                                        Afficher l'image
+                                                    </button>
+                                                ) : (
+                                                    <span className="text-gray-500">Aucune image</span>
+                                                )}
+                                            </div>
+                                            <div className="flex justify-between items-center">
+                                                <label className="relative inline-flex items-center cursor-pointer">
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={article.is_extra}
+                                                        onChange={() => handleToggle(article)}
+                                                        className="sr-only peer"
+                                                    />
+                                                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
+                                                </label>
+                                                {user.role === "admin" && (
+                                                    <div className="flex gap-4">
+                                                        <Link
+                                                            href={route("articles.edit", article.id)}
+                                                            className="text-blue-600 hover:text-blue-900 dark:text-blue-500 dark:hover:text-blue-400 transition"
+                                                        >
+                                                            <FaEdit />
+                                                        </Link>
+                                                        <Link
+                                                            href={route("articles.destroy", article.id)}
+                                                            method="delete"
+                                                            as="button"
+                                                            type="button"
+                                                            className="text-red-600 hover:text-red-900 dark:text-red-500 dark:hover:text-red-400 transition"
+                                                        >
+                                                            <FaTrash />
+                                                        </Link>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
                             </div>
 
                             {/* Pagination */}

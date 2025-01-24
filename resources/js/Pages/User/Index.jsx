@@ -28,7 +28,8 @@ const Index = ({ users }) => {
                 <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
                     <div className="overflow-hidden bg-white shadow-md rounded-lg dark:bg-gray-800">
                         <div className="p-6 text-gray-900 dark:text-gray-100">
-                            <div className="overflow-x-auto">
+                            {/* Desktop Table */}
+                            <div className="hidden md:block overflow-x-auto">
                                 <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                                     <thead className="bg-gray-50 dark:bg-gray-900">
                                         <tr>
@@ -83,6 +84,47 @@ const Index = ({ users }) => {
                                     </tbody>
                                 </table>
                             </div>
+
+                            {/* Mobile List */}
+                            <div className="md:hidden space-y-4">
+                                {users.map((user) => (
+                                    <div key={user.id} className="bg-white shadow-sm rounded-lg p-4 dark:bg-gray-700">
+                                        <div className="space-y-2">
+                                            <div className="flex justify-between items-center">
+                                                <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                                                    ID: {user.id}
+                                                </span>
+                                                <span className="text-sm text-gray-500 dark:text-gray-400">
+                                                    {user.role}
+                                                </span>
+                                            </div>
+                                            <div className="text-sm text-gray-900 dark:text-gray-100">
+                                                {user.name}
+                                            </div>
+                                            <div className="text-sm text-gray-500 dark:text-gray-400">
+                                                {user.email}
+                                            </div>
+                                            <div className="text-sm text-gray-500 dark:text-gray-400">
+                                                {user.tel}
+                                            </div>
+                                            <div className="flex justify-end">
+                                                <Link
+                                                    href={route("users.edit", user.id)}
+                                                    className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-500"
+                                                >
+                                                    <FaEdit />
+                                                </Link>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+
+                            {users.length === 0 && (
+                                <div className="text-center py-6 text-gray-500 dark:text-gray-400">
+                                    Aucun utilisateur disponible.
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>

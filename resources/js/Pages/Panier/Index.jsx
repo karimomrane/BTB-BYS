@@ -58,7 +58,8 @@ const Index = ({ paniers, status }) => {
                 <div className="mx-auto sm:px-6 lg:px-8">
                     <div className="overflow-hidden bg-white shadow-sm sm:rounded-lg dark:bg-gray-800">
                         <div className="p-6 text-gray-900 dark:text-gray-100">
-                            <div className="overflow-x-auto">
+                            {/* Desktop Table */}
+                            <div className="hidden md:block overflow-x-auto">
                                 <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                                     <thead className="bg-gray-50 dark:bg-gray-900">
                                         <tr>
@@ -141,6 +142,73 @@ const Index = ({ paniers, status }) => {
                                     </tbody>
                                 </table>
                             </div>
+
+                            {/* Mobile List */}
+                            <div className="md:hidden space-y-4">
+                                {paniers.map((panier) => (
+                                    <div
+                                        key={panier.id}
+                                        className="bg-white shadow-sm rounded-lg p-4 dark:bg-gray-700"
+                                    >
+                                        <div className="space-y-2">
+                                            <div className="flex justify-between items-center">
+                                                <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                                                    ID: {panier.id}
+                                                </span>
+                                                <span className="text-sm text-gray-500 dark:text-gray-400">
+                                                    {panier.price} DT
+                                                </span>
+                                            </div>
+                                            <div className="text-sm text-gray-900 dark:text-gray-100">
+                                                {panier.name}
+                                            </div>
+                                            <div className="text-sm text-gray-500 dark:text-gray-400">
+                                                {panier.description}
+                                            </div>
+                                            <div className="text-sm text-gray-500 dark:text-gray-400">
+                                                {panier.image ? (
+                                                    <button
+                                                        onClick={() => openImage(`/storage/${panier.image}`)}
+                                                        className="text-blue-600 hover:text-blue-900 dark:text-blue-500 dark:hover:text-blue-400 transition"
+                                                    >
+                                                        Afficher l'image
+                                                    </button>
+                                                ) : (
+                                                    <span className="text-gray-500">Aucune image</span>
+                                                )}
+                                            </div>
+                                            <div className="flex justify-between items-center">
+                                                <button
+                                                    onClick={() => handleViewArticles(panier)}
+                                                    className="text-green-600 hover:text-green-900 dark:text-green-500 dark:hover:text-green-400 transition"
+                                                >
+                                                    Voir Articles
+                                                </button>
+                                                {user.role === "admin" && (
+                                                    <div className="flex gap-4">
+                                                        <Link
+                                                            href={route("paniers.edit", panier.id)}
+                                                            className="text-blue-600 hover:text-blue-900 dark:text-blue-500 dark:hover:text-blue-400 transition"
+                                                        >
+                                                            Editer
+                                                        </Link>
+                                                        <Link
+                                                            href={route("paniers.destroy", panier.id)}
+                                                            method="delete"
+                                                            as="button"
+                                                            type="button"
+                                                            className="text-red-600 hover:text-red-900 dark:text-red-500 dark:hover:text-red-400 transition"
+                                                        >
+                                                            Supprimer
+                                                        </Link>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+
                             {paniers.length === 0 && (
                                 <div className="text-center py-6 text-gray-500 dark:text-gray-400">
                                     Aucun panier disponible.
@@ -150,6 +218,8 @@ const Index = ({ paniers, status }) => {
                     </div>
                 </div>
             </div>
+
+            {/* Full-screen image modal */}
             <AnimatePresence>
                 {selectedImage && (
                     <motion.div
@@ -170,6 +240,8 @@ const Index = ({ paniers, status }) => {
                     </motion.div>
                 )}
             </AnimatePresence>
+
+            {/* Articles Modal */}
             <AnimatePresence>
                 {selectedPanier && (
                     <ArticlesModal

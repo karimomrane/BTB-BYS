@@ -1,7 +1,7 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Head, Link, useForm } from "@inertiajs/react";
 import { Toaster, toast } from "react-hot-toast";
-import { useEffect } from "react";
+import { useEffect, useState } from "react"; // Import useState
 import InputError from "@/Components/InputError";
 
 const Create = ({ articles, paniers }) => {
@@ -9,6 +9,13 @@ const Create = ({ articles, paniers }) => {
         panier_id: "",
         articles: [],
     });
+
+    const [searchQuery, setSearchQuery] = useState(""); // State for search query
+
+    // Filter articles based on search query
+    const filteredArticles = articles.filter((article) =>
+        article.name.toLowerCase().includes(searchQuery.toLowerCase())
+    );
 
     const handleArticleChange = (articleId, checked) => {
         if (checked) {
@@ -46,7 +53,6 @@ const Create = ({ articles, paniers }) => {
             formData.append(`articles[${index}][quantity]`, article.quantity);
         });
 
-
         post(route("article_paniers.store"), formData, {
             onSuccess: () => {
                 toast.success("Articles ajoutés au panier avec succès!");
@@ -58,8 +64,6 @@ const Create = ({ articles, paniers }) => {
             },
         });
     };
-
-
 
     return (
         <AuthenticatedLayout
@@ -99,10 +103,23 @@ const Create = ({ articles, paniers }) => {
 
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                        Rechercher des articles
+                                    </label>
+                                    <input
+                                        type="text"
+                                        placeholder="Rechercher un article..."
+                                        value={searchQuery}
+                                        onChange={(e) => setSearchQuery(e.target.value)}
+                                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100"
+                                    />
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                                         Articles
                                     </label>
                                     <div className="mt-1 space-y-2">
-                                        {articles.map((article) => (
+                                        {filteredArticles.map((article) => (
                                             <div
                                                 key={article.id}
                                                 className="flex items-center justify-between p-2 border rounded-lg dark:border-gray-600"
