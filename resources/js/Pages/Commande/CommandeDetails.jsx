@@ -22,8 +22,6 @@ const CommandeDetails = ({ commande, panierCommandes, articleCommandes, isOpen, 
             return total + (ac.article?.price || 0) * ac.quantity;
         }, 0);
 
-
-
         // Return the combined total
         return paniersTotal + articlesTotal;
     };
@@ -56,16 +54,16 @@ const CommandeDetails = ({ commande, panierCommandes, articleCommandes, isOpen, 
                     <FaXmark className="w-8 h-8 hover:text-red-600" />
                 </button>
             </div>
-            <div className="space-y-4 overflow-y-auto max-h-[550px]">
-
+            <div className="space-y-4 overflow-y-auto max-h-[550px] p-4">
 
                 {/* Invoice Header */}
-                <div className="flex justify-between items-center mb-6">
-                    <div>
-                        <h2 className="text-2xl font-bold">Bon de Commande</h2>
-                        <p className="text-sm text-gray-600 dark:text-gray-400">Commande N°{commande.id}</p>
+                <div className="flex flex-col sm:flex-row justify-between sm:items-center mb-6">
+                    <div className="mb-4 sm:mb-0">
+                        <h2 className="text-xl sm:text-2xl font-bold text-center">Bon de Commande</h2>
+
                     </div>
-                    <div className="text-right">
+                    <div className="text-left">
+                        <p className="text-sm text-gray-600 dark:text-gray-400"> <strong>N°</strong>{commande.id}</p>
                         <p className="text-sm text-gray-600 dark:text-gray-400">
                             <strong>Date:</strong> {new Date(commande.created_at).toLocaleDateString("fr-FR")}
                         </p>
@@ -78,7 +76,7 @@ const CommandeDetails = ({ commande, panierCommandes, articleCommandes, isOpen, 
                 {/* Client Information */}
                 <div className="mb-6">
                     <h3 className="text-lg font-semibold mb-2">Informations du Client</h3>
-                    <div className="grid grid-cols-2 gap-x-96">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
                             <p className="text-sm text-gray-600 dark:text-gray-400">
                                 <strong>Nom:</strong> {commande.user.name}
@@ -108,50 +106,81 @@ const CommandeDetails = ({ commande, panierCommandes, articleCommandes, isOpen, 
                 )}
 
                 {/* Panier Table */}
-                <PanierTable panierCommandes={panierCommandes.filter((pc) => pc.commande_id === commande.id)} />
+                <div className="overflow-x-auto">
+                    <PanierTable panierCommandes={panierCommandes.filter((pc) => pc.commande_id === commande.id)} />
+                </div>
 
-                {/* Extra Articles Table */}
-                <div className="mb-6">
-                    <h3 className="text-lg font-semibold mb-2">Articles Supplémentaires</h3>
-                    <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                        <thead className="bg-gray-50 dark:bg-gray-900">
-                            <tr>
-                                <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400">
-                                    Article
-                                </th>
-                                <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400">
-                                    Quantité
-                                </th>
-                                <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400">
-                                    Prix Unitaire
-                                </th>
-                                <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400">
-                                    Total
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody className="bg-white divide-y divide-gray-200 dark:bg-gray-800 dark:divide-gray-700">
+                {articleCommandes.filter((ac) => ac.commande_id === commande.id).length > 0 && (
+                    <div className="mb-6">
+                        <h3 className="text-lg font-semibold mb-2">Articles Supplémentaires</h3>
+
+                        {/* Mobile View (Stacked Layout) */}
+                        <div className="sm:hidden space-y-4">
                             {articleCommandes
                                 .filter((ac) => ac.commande_id === commande.id)
                                 .map((ac) => (
-                                    <tr key={ac.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
-                                        <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                                            {ac.article?.name}
-                                        </td>
-                                        <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                                            {ac.quantity}
-                                        </td>
-                                        <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                                            {ac.article?.price} DT
-                                        </td>
-                                        <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                                            {(ac.article?.price || 0) * ac.quantity} DT
-                                        </td>
-                                    </tr>
+                                    <div key={ac.id} className="bg-white dark:bg-gray-800 shadow-sm rounded-lg p-4">
+                                        <div className="space-y-2">
+                                            <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                                                {ac.article?.name}
+                                            </p>
+                                            <p className="text-xs text-gray-600 dark:text-gray-400">
+                                                Quantité: {ac.quantity}
+                                            </p>
+                                            <p className="text-sm text-gray-900 dark:text-gray-100">
+                                                Prix Unitaire: {ac.article?.price} DT
+                                            </p>
+                                            <p className="text-sm text-gray-900 dark:text-gray-100">
+                                                Total: {(ac.article?.price || 0) * ac.quantity} DT
+                                            </p>
+                                        </div>
+                                    </div>
                                 ))}
-                        </tbody>
-                    </table>
-                </div>
+                        </div>
+
+                        {/* Desktop View (Original Table Layout) */}
+                        <div className="hidden sm:block overflow-x-auto">
+                            <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                                <thead className="bg-gray-50 dark:bg-gray-900">
+                                    <tr>
+                                        <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400">
+                                            Article
+                                        </th>
+                                        <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400">
+                                            Quantité
+                                        </th>
+                                        <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400">
+                                            Prix Unitaire
+                                        </th>
+                                        <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400">
+                                            Total
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody className="bg-white divide-y divide-gray-200 dark:bg-gray-800 dark:divide-gray-700">
+                                    {articleCommandes
+                                        .filter((ac) => ac.commande_id === commande.id)
+                                        .map((ac) => (
+                                            <tr key={ac.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
+                                                <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                                                    {ac.article?.name}
+                                                </td>
+                                                <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                                                    {ac.quantity}
+                                                </td>
+                                                <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                                                    {ac.article?.price} DT
+                                                </td>
+                                                <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                                                    {(ac.article?.price || 0) * ac.quantity} DT
+                                                </td>
+                                            </tr>
+                                        ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                )}
 
                 {/* Total Section */}
                 <div className="mt-6 flex justify-end">
