@@ -1,462 +1,692 @@
-import React, { useEffect, useState } from "react";
-import NavLink from "@/Components/NavLink";
+ {/* Cart Modal */}
+ <AnimatePresence>
+ {isCartOpen && (
+     <motion.div
+         initial={{ opacity: 0 }}
+         animate={{ opacity: 1 }}
+         exit={{ opacity: 0 }}
+         className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+         onClick={closeCart}
+     >
+         <motion.div
+             initial={{ y: -50, opacity: 0 }}
+             animate={{ y: 0, opacity: 1 }}
+             exit={{ y: -50, opacity: 0 }}
+             className="bg-white dark:bg-gray-800 rounded-lg h-[400px] overflow-auto shadow-lg w-full max-w-4xl mx-4 p-6"
+             onClick={(e) => e.stopPropagation()}
+         >
+             {/* Logo and Header */}
+             <div className="flex items-center justify-center mb-6">
+                 <img
+                     src="/path/to/your/logo.png" // Replace with your logo path
+                     alt="Logo"
+                     className="h-12 w-auto"
+                 />
+                 <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 ml-4">
+                     Panier
+                 </h2>
+             </div>
+
+             {/* Display Selected Panier Articles and Quantity Input */}
+             {selectedPaniers.length > 0 && (
+                 <div className="mb-6">
+                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-400 mb-2">
+                         Détails des Paniers
+                     </label>
+                     <div className="mt-2">
+                         {/* Mobile View (Stacked Layout) */}
+                         <div className="sm:hidden space-y-4">
+                             {paniers
+                                 .filter((panier) => selectedPaniers.includes(panier.id))
+                                 .map((panier) => (
+                                     <div
+                                         key={panier.id}
+                                         className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow"
+                                     >
+                                         <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                                             {panier.name}
+                                         </p>
+                                         <p className="text-xs text-gray-600 dark:text-gray-400">
+                                             Prix Unitaire: {panier.price} DT
+                                         </p>
+                                         <p className="text-xs text-gray-600 dark:text-gray-400">
+                                             Quantité: {panierQuantities[panier.id] || 1}
+                                         </p>
+                                         <p className="text-xs text-gray-600 dark:text-gray-400">
+                                             Total: {calculatePanierTotal(panier)} DT
+                                         </p>
+                                         {/* Display Articles for Each Panier */}
+                                         {panier.articles && panier.articles.length > 0 && (
+                                             <div className="mt-2">
+                                                 <p className="text-xs font-medium text-gray-900 dark:text-gray-100">
+                                                     Articles inclus:
+                                                 </p>
+                                                 {panier.articles.map((article) => (
+                                                     <div key={article.id} className="ml-4">
+                                                         <p className="text-xs text-gray-600 dark:text-gray-400">
+                                                             {article.name} (x{article.pivot.quantity})
+                                                         </p>
+                                                     </div>
+                                                 ))}
+                                             </div>
+                                         )}
+                                     </div>
+                                 ))}
+                         </div>
+
+                         {/* Desktop View (Table Layout) */}
+                         <div className="hidden sm:block overflow-x-auto">
+                             <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                                 <thead className="bg-gray-50 dark:bg-gray-900">
+                                     <tr>
+                                         <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400">
+                                             Produit
+                                         </th>
+                                         <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400">
+                                             Prix Unitaire
+                                         </th>
+                                         <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400">
+                                             Quantité
+                                         </th>
+                                         <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400">
+                                             Total
+                                         </th>
+                                     </tr>
+                                 </thead>
+                                 <tbody className="bg-white divide-y divide-gray-200 dark:bg-gray-800 dark:divide-gray-700">
+                                     {paniers
+                                         .filter((panier) => selectedPaniers.includes(panier.id))
+                                         .map((panier) => (
+                                             <React.Fragment key={panier.id}>
+                                                 <tr className="hover:bg-gray-50 dark:hover:bg-gray-700">
+                                                     <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                                                         {panier.name}
+                                                     </td>
+                                                     <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                                                         {panier.price} DT
+                                                     </td>
+                                                     <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                                                         <input
+                                                             type="number"
+                                                             value={panierQuantities[panier.id] || 1}
+                                                             onChange={(e) =>
+                                                                 handleQuantityChange(panier.id, parseInt(e.target.value))
+                                                             }
+                                                             min="1"
+                                                             className="w-20 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300"
+                                                         />
+                                                     </td>
+                                                     <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                                                         {calculatePanierTotal(panier)} DT
+                                                     </td>
+                                                 </tr>
+                                                 {/* Display Articles for Each Panier */}
+                                                 {panier.articles && panier.articles.length > 0 && (
+                                                     <tr>
+                                                         <td colSpan={4} className="px-4 py-2">
+                                                             <div className="pl-8">
+                                                                 <table className="w-full">
+                                                                     <thead>
+                                                                         <tr>
+                                                                             <th className="text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400">
+                                                                                 Article
+                                                                             </th>
+                                                                             <th className="text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400">
+                                                                                 Quantité
+                                                                             </th>
+                                                                         </tr>
+                                                                     </thead>
+                                                                     <tbody>
+                                                                         {panier.articles.map((article) => (
+                                                                             <tr key={article.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
+                                                                                 <td className="px-4 py-2 text-sm text-gray-900 dark:text-gray-100">
+                                                                                     {article.name}
+                                                                                 </td>
+                                                                                 <td className="px-4 py-2 text-sm text-gray-900 dark:text-gray-100">
+                                                                                     {article.pivot.quantity}
+                                                                                 </td>
+                                                                             </tr>
+                                                                         ))}
+                                                                     </tbody>
+                                                                 </table>
+                                                             </div>
+                                                         </td>
+                                                     </tr>
+                                                 )}
+                                             </React.Fragment>
+                                         ))}
+                                 </tbody>
+                             </table>
+                         </div>
+                     </div>
+                 </div>
+             )}
+
+             {/* Display Selected Extra Articles and Quantity Input */}
+             {selectedExtraArticles.length > 0 && (
+                 <div className="mb-6">
+                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-400 mb-2">
+                         Détails des Articles Supplémentaires
+                     </label>
+                     <div className="mt-2">
+                         {/* Mobile View (Stacked Layout) */}
+                         <div className="sm:hidden space-y-4">
+                             {articles
+                                 .filter((article) => selectedExtraArticles.includes(article.id))
+                                 .map((article) => (
+                                     <div
+                                         key={article.id}
+                                         className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow"
+                                     >
+                                         <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                                             {article.name}
+                                         </p>
+                                         <p className="text-xs text-gray-600 dark:text-gray-400">
+                                             Prix Unitaire: {article.price} DT
+                                         </p>
+                                         <p className="text-xs text-gray-600 dark:text-gray-400">
+                                             Quantité: {extraArticleQuantities[article.id] || 1}
+                                         </p>
+                                         <p className="text-xs text-gray-600 dark:text-gray-400">
+                                             Total: {calculateExtraArticleTotal(article)} DT
+                                         </p>
+                                     </div>
+                                 ))}
+                         </div>
+
+                         {/* Desktop View (Table Layout) */}
+                         <div className="hidden sm:block overflow-x-auto">
+                             <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                                 <thead className="bg-gray-50 dark:bg-gray-900">
+                                     <tr>
+                                         <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400">
+                                             Article
+                                         </th>
+                                         <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400">
+                                             Prix Unitaire
+                                         </th>
+                                         <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400">
+                                             Quantité
+                                         </th>
+                                         <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400">
+                                             Total
+                                         </th>
+                                     </tr>
+                                 </thead>
+                                 <tbody className="bg-white divide-y divide-gray-200 dark:bg-gray-800 dark:divide-gray-700">
+                                     {articles
+                                         .filter((article) => selectedExtraArticles.includes(article.id))
+                                         .map((article) => (
+                                             <tr key={article.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
+                                                 <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                                                     {article.name}
+                                                 </td>
+                                                 <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                                                     {article.price} DT
+                                                 </td>
+                                                 <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                                                     <input
+                                                         type="number"
+                                                         value={extraArticleQuantities[article.id] || 1}
+                                                         onChange={(e) =>
+                                                             handleExtraArticleQuantityChange(article.id, parseInt(e.target.value))
+                                                         }
+                                                         min="1"
+                                                         className="w-20 rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300"
+                                                     />
+                                                 </td>
+                                                 <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                                                     {calculateExtraArticleTotal(article)} DT
+                                                 </td>
+                                             </tr>
+                                         ))}
+                                 </tbody>
+                             </table>
+                         </div>
+                     </div>
+                 </div>
+             )}
+
+             {/* Grand Total */}
+             <div className="mt-6 text-right">
+                 <p className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                     Total: {calculateGrandTotal()} DT
+                 </p>
+             </div>
+
+             {/* Close Button */}
+             <button
+                 onClick={closeCart}
+                 className="mt-6 w-full bg-indigo-600 text-white py-2 rounded-md hover:bg-indigo-500 transition-colors"
+             >
+                 Fermer
+             </button>
+         </motion.div>
+     </motion.div>
+ )}
+</AnimatePresence>
+
+
+////////////////////////////////////
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
-import { Head, Link, usePage } from "@inertiajs/react";
+import { Head, useForm } from "@inertiajs/react";
+import { AnimatePresence, motion } from "framer-motion";
+import React, { useState } from "react";
 import toast, { Toaster } from "react-hot-toast";
-import { motion, AnimatePresence } from "framer-motion";
-// import { jsPDF } from "jspdf";
-// import "jspdf-autotable"; // Import the autoTable plugin
+import ExtraArticlesSection from "./ExtraArticlesSection";
+import PanierSelectionSection from "./PanierSelectionSection";
 
-// Define status styles as a constant
-const STATUS_STYLES = {
-    "Commandé": "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200",
-    "En cours de préparation": "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200",
-    "Préparé": "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200",
-    "En cours de livraison": "bg-teal-100 text-teal-800 dark:bg-teal-900 dark:text-teal-200",
-    "Livré": "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200",
-    "Payé": "bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200",
-    "Annulé": "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200",
-};
+const Add = ({ paniers, articles }) => {
+    const [selectedPaniers, setSelectedPaniers] = useState([]);
+    const [panierQuantities, setPanierQuantities] = useState({}); // Track quantity for each panier
+    const [showProducts, setShowProducts] = useState(false);
+    const [showExtraArticles, setShowExtraArticles] = useState(false);
+    const [selectedExtraArticles, setSelectedExtraArticles] = useState([]);
+    const [extraArticleQuantities, setExtraArticleQuantities] = useState({}); // Track quantity for each extra article
 
-// Define table headers as constants
-const COMMANDES_HEADERS = ["ID", "Date Prévu", "Status", "Créé par", "Créé le", "Action"];
-const PANIER_COMMANDES_HEADERS = ["ID", "Panier", "Commande", "Quantité", "Actions"];
+    const { data, setData, post, errors, processing } = useForm({
+        date: "",
+        description: "",
+        paniers: [], // Array to store selected panier IDs and quantities
+        articles_commandes: [], // Array to store selected extra articles and quantities
+    });
 
-const Index = ({ commandes, panierCommandes, status }) => {
-    const user = usePage().props.auth.user;
-    const [selectedCommande, setSelectedCommande] = useState(null); // Track selected commande
-    const [selectedPanier, setSelectedPanier] = useState(null); // Track selected panier
+    // Handle panier selection
+    const handlePanierSelection = (panierId) => {
+        setSelectedPaniers((prev) => {
+            let updatedPaniers;
+            if (prev.includes(panierId)) {
+                // Deselect panier
+                updatedPaniers = prev.filter((id) => id !== panierId);
+                const updatedQuantities = { ...panierQuantities };
+                delete updatedQuantities[panierId]; // Remove quantity for deselected panier
+                setPanierQuantities(updatedQuantities);
+            } else {
+                // Select panier
+                updatedPaniers = [...prev, panierId];
+                setPanierQuantities((prevQuantities) => ({
+                    ...prevQuantities,
+                    [panierId]: 1, // Default quantity to 1
+                }));
+            }
 
-    useEffect(() => {
-        if (status) {
-            toast.success(status);
-        }
-    }, [status]);
+            // Update the `data` object with the new paniers and quantities
+            const paniersData = updatedPaniers.map((id) => ({
+                panier_id: id,
+                quantity: panierQuantities[id] || 1,
+            }));
+            setData("paniers", paniersData);
 
-    // Handle commande click
-    const handleCommandeClick = (commande) => {
-        if (selectedCommande?.id === commande.id) {
-            setSelectedCommande(null); // Collapse if already selected
-        } else {
-            setSelectedCommande(commande); // Expand the selected commande
-        }
+            return updatedPaniers;
+        });
     };
 
-    // Handle panier click
-    const handlePanierClick = (panier) => {
-        if (selectedPanier?.id === panier.id) {
-            setSelectedPanier(null); // Collapse if already selected
-        } else {
-            setSelectedPanier(panier); // Expand the selected panier
-        }
+    // Handle quantity change for a panier
+    const handleQuantityChange = (panierId, quantity) => {
+        setPanierQuantities((prevQuantities) => {
+            const updatedQuantities = {
+                ...prevQuantities,
+                [panierId]: quantity,
+            };
+
+            // Update the `data` object with the new quantities
+            const paniersData = selectedPaniers.map((id) => ({
+                panier_id: id,
+                quantity: updatedQuantities[id] || 1,
+            }));
+            setData("paniers", paniersData);
+
+            return updatedQuantities;
+        });
     };
 
-    // Calculate the total for a commande
-    const calculateTotal = (commandeId) => {
-        const associatedPaniers = panierCommandes.filter((pc) => pc.commande_id === commandeId);
-        return associatedPaniers.reduce((total, pc) => {
-            return total + (pc.panier?.price || 0) * pc.quantity;
+    // Handle extra article selection
+    const handleExtraArticleSelection = (articleId) => {
+        setSelectedExtraArticles((prev) => {
+            let updatedArticles;
+            if (prev.includes(articleId)) {
+                // Deselect article
+                updatedArticles = prev.filter((id) => id !== articleId);
+                const updatedQuantities = { ...extraArticleQuantities };
+                delete updatedQuantities[articleId]; // Remove quantity for deselected article
+                setExtraArticleQuantities(updatedQuantities);
+            } else {
+                // Select article
+                updatedArticles = [...prev, articleId];
+                setExtraArticleQuantities((prevQuantities) => ({
+                    ...prevQuantities,
+                    [articleId]: 1, // Default quantity to 1
+                }));
+            }
+
+            // Update the `data` object with the new articles and quantities
+            const articlesData = updatedArticles.map((id) => ({
+                article_id: id,
+                quantity: extraArticleQuantities[id] || 1,
+            }));
+            setData("articles_commandes", articlesData);
+
+            return updatedArticles;
+        });
+    };
+
+    // Handle quantity change for an extra article
+    const handleExtraArticleQuantityChange = (articleId, quantity) => {
+        setExtraArticleQuantities((prevQuantities) => {
+            const updatedQuantities = {
+                ...prevQuantities,
+                [articleId]: quantity,
+            };
+
+            // Update the `data` object with the new quantities
+            const articlesData = selectedExtraArticles.map((id) => ({
+                article_id: id,
+                quantity: updatedQuantities[id] || 1,
+            }));
+            setData("articles_commandes", articlesData);
+
+            return updatedQuantities;
+        });
+    };
+
+    // Calculate total price for a panier
+    const calculatePanierTotal = (panier) => {
+        const quantity = panierQuantities[panier.id] || 1;
+        return panier.price * quantity;
+    };
+
+    // Calculate total price for an extra article
+    const calculateExtraArticleTotal = (article) => {
+        const quantity = extraArticleQuantities[article.id] || 1;
+        return article.price * quantity;
+    };
+
+    // Calculate grand total for all selected paniers and extra articles
+    const calculateGrandTotal = () => {
+        const paniersTotal = selectedPaniers.reduce((total, panierId) => {
+            const panier = paniers.find((p) => p.id === panierId);
+            return total + calculatePanierTotal(panier);
         }, 0);
+
+        const articlesTotal = selectedExtraArticles.reduce((total, articleId) => {
+            const article = articles.find((a) => a.id === articleId);
+            return total + calculateExtraArticleTotal(article);
+        }, 0);
+
+        return paniersTotal + articlesTotal;
     };
 
-    // // Generate and download PDF
-    // const downloadCommandePDF = (commande) => {
-    //     const doc = new jsPDF();
+    // Handle form submission
+    const submit = (e) => {
+        e.preventDefault();
 
-    //     // Add company logo (50px width and height)
-    //     const logoUrl = "/logo.png"; // Replace with the path to your logo
-    //     doc.addImage(logoUrl, "PNG", 10, 10, 20, 20); // 50px width and height
+        // Prepare paniers data with quantities
+        const paniersData = selectedPaniers.map((panierId) => ({
+            panier_id: panierId,
+            quantity: panierQuantities[panierId] || 1,
+        }));
 
-    //     // Add company information on the left
-    //     doc.setFontSize(9);
-    //     doc.setTextColor(100); // Gray color for company info
-    //     doc.text("STE CENTRALE COMMERCIALE", 140, 20);
-    //     doc.text("123 OUED ELLIL ,MANOUBA", 140, 26);
-    //     doc.text("MANOUBA, TUNIS, 2036", 140, 32);
-    //     doc.text("Phone: +216 29 613 714", 140, 38);
-    //     doc.text("Email: info@benyaghlaneshops.com", 140, 44);
+        // Prepare extra articles data with quantities
+        const articlesData = selectedExtraArticles.map((articleId) => ({
+            article_id: articleId,
+            quantity: extraArticleQuantities[articleId] || 1,
+        }));
 
-    //     // Add client information on the right
-    //     doc.setFontSize(9);
-    //     doc.setTextColor(100); // Gray color for client info
-    //     const clientInfoX = 140; // X position for client info (right side)
-    //     doc.text(`Nom: ${commande.user.name}`, clientInfoX, 80);
-    //     doc.text(`Email: ${commande.user.email}`, clientInfoX, 86);
-    //     doc.text(`Date de Commande: ${new Date(commande.created_at).toLocaleDateString("fr-FR")}`, clientInfoX, 92);
-    //     doc.text(`Date Prévue: ${commande.date}`, clientInfoX, 98);
+        // Update form data
+        setData("paniers", paniersData);
+        setData("articles_commandes", articlesData);
 
-    //     // Add invoice title
-    //     doc.setFontSize(18);
-    //     doc.setTextColor(0); // Black color for title
-    //     doc.text(`Bon de Commande N°  ${commande.id}`, 10, 70);
+        // Submit the form
+        post(route("commandes.store"), {
+            onSuccess: () => {
 
-    //     // Add invoice details
-    //     doc.setFontSize(12);
-    //     doc.text(`Date: ${new Date(commande.created_at).toLocaleDateString("fr-FR")}`, 10, 86);
-    //     doc.text(`Statut: ${commande.status}`, 10, 92);
-
-    //     // Add commande details table
-    //     doc.setFontSize(14);
-    //     doc.text("Détails de la Commande", 10, 110);
-    //     const headers = ["Produit", "Quantité", "Prix Unitaire", "Total"];
-    //     const data = panierCommandes
-    //         .filter((pc) => pc.commande_id === commande.id)
-    //         .map((pc) => [
-    //             pc.panier?.name || "N/A",
-    //             pc.quantity,
-    //             `${(pc.panier?.price || 0).toFixed(2)} DT`,
-    //             `${((pc.panier?.price || 0) * pc.quantity).toFixed(2)} DT`,
-    //         ]);
-
-    //     // Generate the table
-    //     doc.autoTable({
-    //         startY: 120, // Start the table below the header sections
-    //         startX: 10,
-    //         head: [headers], // Table headers
-    //         body: data, // Table data
-    //         theme: "striped", // Use a striped theme for better styling
-    //         headStyles: {
-    //             fillColor: [128, 128, 128], // Grey header background color
-    //             textColor: [255, 255, 255], // Header text color (white)
-    //             fontStyle: "bold", // Bold header text
-    //             halign: "center", // Center-align header text
-    //         },
-    //         columnStyles: {
-    //             0: { cellWidth: 80 }, // Product column (left-aligned)
-    //             1: { cellWidth: 30 }, // Quantity column (center-aligned)
-    //             2: { cellWidth: 40 }, // Unit Price column (right-aligned)
-    //             3: { cellWidth: 40 }, // Total column (right-aligned)
-    //         },
-    //     });
-
-    //     // Add total section
-    //     const total = calculateTotal(commande.id).toFixed(2);
-    //     doc.setFontSize(10);
-    //     doc.text("Sous-Total", 150, doc.autoTable.previous.finalY + 10);
-    //     doc.text(`${total} DT`, 170, doc.autoTable.previous.finalY + 10);
-
-    //     doc.setFontSize(10);
-    //     doc.text("TVA 0%", 150, doc.autoTable.previous.finalY + 16);
-    //     doc.text(`${0} DT`, 170, doc.autoTable.previous.finalY + 16);
-
-    //     doc.setFontSize(14);
-    //     doc.text("Total", 150, doc.autoTable.previous.finalY + 22);
-    //     doc.text(`${total} DT`, 170, doc.autoTable.previous.finalY + 22);
-
-    //     // Add footer
-    //     doc.setFontSize(10);
-    //     doc.setTextColor(100); // Gray color for footer
-    //     doc.text("Merci pour votre confiance !", 40 + 40, 0 + 280);
-    //     doc.text("Pour toute question, contactez-nous à info@benyaghlaneshops.com.", 15 + 40, 6 + 280);
-
-    //     // Save the PDF
-    //     doc.save(`Commande_Commande_${commande.id}.pdf`);
-    // };
+            },
+            onError: () => {
+                toast.error("Une erreur s'est produite lors de la création de la commande.");
+            },
+        });
+    };
 
     return (
         <AuthenticatedLayout
             header={
                 <h2 className="text-xl font-semibold leading-tight text-gray-800 dark:text-gray-200">
-                    <NavLink
-                        href={route('commandes.create')}
-                        active={route().current('commandes.create')}
-                        className="px-4 py-2 rounded border-b-2 border-indigo-600"
-                    >
-                        Nouvelle Commande
-                    </NavLink>
-
-                    {user.role === "admin" && (
-                        <NavLink
-                            href={route('panier_commandes.create')}
-                            active={route().current('panier_commandes.create')}
-                            className="px-4 py-2 ml-4 rounded border-b-2 border-indigo-600"
-                        >
-                            Ajouter Panier Commande
-                        </NavLink>
-                    )}
+                    Ajouter une commande
                 </h2>
             }
         >
-            <Head title="Liste des commandes" />
-            <Toaster />
-            <div className="py-12">
+            <Head title="Ajouter une commande" />
+            <Toaster position="bottom-center" reverseOrder={false} />
+            <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.5 }}
+                className="py-5"
+            >
                 <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
-                    {/* Commandes Table */}
-                    <div className="overflow-hidden bg-white shadow-sm sm:rounded-lg dark:bg-gray-800">
+                    {/* Panier Selection Section */}
+                    <PanierSelectionSection
+                        paniers={paniers}
+                        selectedPaniers={selectedPaniers}
+                        handlePanierSelection={handlePanierSelection}
+                    />
+
+                    {/* Extra Articles Selection Section */}
+                    <ExtraArticlesSection
+                        articles={articles}
+                        selectedExtraArticles={selectedExtraArticles}
+                        handleExtraArticleSelection={handleExtraArticleSelection}
+                    />
+
+                    {/* Create Commande Form Section */}
+                    <motion.div
+                        initial={{ opacity: 0, x: 100 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ duration: 0.5, delay: 1 }}
+                        className="overflow-hidden bg-white shadow-sm sm:rounded-lg dark:bg-gray-800"
+                    >
                         <div className="p-6 text-gray-900 dark:text-gray-100">
-                            <div className="overflow-x-auto">
-                                <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                                    <thead className="bg-gray-50 dark:bg-gray-900">
-                                        <tr>
-                                            {COMMANDES_HEADERS.map((header) => (
-                                                <th
-                                                    key={header}
-                                                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400"
-                                                >
-                                                    {header}
-                                                </th>
-                                            ))}
-                                        </tr>
-                                    </thead>
-                                    <tbody className="bg-white divide-y divide-gray-200 dark:bg-gray-800 dark:divide-gray-700">
-                                        {commandes.map((commande) => (
-                                            <AnimatePresence key={commande.id}>
-                                                <tr
-                                                    onClick={() => handleCommandeClick(commande)}
-                                                    className="hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer"
-                                                >
-                                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                                                        {commande.id}
-                                                    </td>
-                                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                                                        {commande.date}
-                                                    </td>
-                                                    <td className="px-6 py-4 whitespace-nowrap text-sm">
-                                                        <span
-                                                            className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${STATUS_STYLES[commande.status]}`}
-                                                        >
-                                                            {commande.status}
-                                                        </span>
-                                                    </td>
-                                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                                                        {commande.user.name}
-                                                    </td>
-                                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                                                        {new Date(commande.created_at).toLocaleDateString("fr-FR")}
-                                                    </td>
-                                                    {user.role === "admin" && (
-                                                        <td className="px-6 py-4 whitespace-nowrap flex gap-4">
-                                                            <Link
-                                                                href={route("commandes.edit", commande.id)}
-                                                                className="text-blue-600 hover:text-blue-900 dark:text-blue-500 dark:hover:text-blue-400 transition"
-                                                            >
-                                                                Editer
-                                                            </Link>
-                                                            <Link
-                                                                href={route("commandes.destroy", commande.id)}
-                                                                method="delete"
-                                                                as="button"
-                                                                type="button"
-                                                                className="text-red-600 hover:text-red-900 dark:text-red-500 dark:hover:text-red-400 transition"
-                                                            >
-                                                                Supprimer
-                                                            </Link>
-                                                        </td>
-                                                    )}
-                                                </tr>
-                                                {/* Animated Details Section */}
-                                                <AnimatePresence>
-                                                    {selectedCommande?.id === commande.id && (
-                                                        <motion.tr
-                                                            initial={{ opacity: 0, height: 0 }}
-                                                            animate={{ opacity: 1, height: "auto" }}
-                                                            exit={{ opacity: 0, height: 0 }}
-                                                            transition={{ duration: 0.3 }}
-                                                            className="bg-gray-50 dark:bg-gray-700"
-                                                        >
-                                                            <td colSpan={COMMANDES_HEADERS.length} className="px-6 py-4">
-                                                                <div className="space-y-4">
-                                                                    {/* Invoice Header */}
-                                                                    <div className="flex justify-between items-center mb-6">
-                                                                        <div>
-                                                                            <h2 className="text-2xl font-bold">Bon de Commande</h2>
-                                                                            <p className="text-sm text-gray-600 dark:text-gray-400">Commande N°{commande.id}</p>
-                                                                        </div>
-                                                                        <div className="text-right">
-                                                                            <p className="text-sm text-gray-600 dark:text-gray-400">
-                                                                                <strong>Date:</strong> {new Date(commande.created_at).toLocaleDateString("fr-FR")}
-                                                                            </p>
-                                                                            <p className="text-sm text-gray-600 dark:text-gray-400">
-                                                                                <strong>Statut:</strong> {commande.status}
-                                                                            </p>
-                                                                        </div>
-                                                                    </div>
+                            <form onSubmit={submit}>
+                                {/* Date and Description Fields */}
+                                <div className="mb-4">
+                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-400">
+                                        Date Prévu
+                                    </label>
+                                    <input
+                                        type="date"
+                                        value={data.date}
+                                        onChange={(e) => setData("date", e.target.value)}
+                                        min={new Date().toISOString().split("T")[0]}
+                                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300"
+                                    />
+                                    <span className="text-red-500 text-xs">{errors.date}</span>
+                                </div>
 
-                                                                    {/* Client Information */}
-                                                                    <div className="mb-6">
-                                                                        <h3 className="text-lg font-semibold mb-2">Informations du Client</h3>
-                                                                        <div className="grid grid-cols-2 gap-x-96">
-                                                                            <div>
-                                                                                <p className="text-sm text-gray-600 dark:text-gray-400">
-                                                                                    <strong>Nom:</strong> {commande.user.name}
-                                                                                </p>
-                                                                                <p className="text-sm text-gray-600 dark:text-gray-400">
-                                                                                    <strong>Email:</strong> {commande.user.email}
-                                                                                </p>
-                                                                            </div>
-                                                                            <div>
-                                                                                <p className="text-sm text-gray-600 dark:text-gray-400">
-                                                                                    <strong>Date de Commande:</strong> {new Date(commande.created_at).toLocaleDateString("fr-FR")}
-                                                                                </p>
-                                                                                <p className="text-sm text-gray-600 dark:text-gray-400">
-                                                                                    <strong>Date Prévue:</strong> {commande.date}
-                                                                                </p>
-                                                                            </div>
-                                                                        </div>
-                                                                    </div>
+                                <div className="mb-4">
+                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-400">
+                                        Description (optionnel)
+                                    </label>
+                                    <textarea
+                                        value={data.description}
+                                        onChange={(e) => setData("description", e.target.value)}
+                                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300"
+                                    />
+                                    <span className="text-red-500 text-xs">{errors.description}</span>
+                                </div>
 
-                                                                    {/* Display Commande Description if it exists */}
-                                                                    {commande.description && (
-                                                                        <div className="mb-6">
-                                                                            <p className="text-sm text-gray-600 dark:text-gray-400">
-                                                                                <strong> Observation : </strong> {commande.description}
-                                                                            </p>
-                                                                        </div>
-                                                                    )}
-
-                                                                    {/* Invoice Table */}
-                                                                    <div className="mb-6">
-                                                                        <h3 className="text-lg font-semibold mb-4">Détails de la Commande</h3>
-                                                                        <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                                                                            <thead className="bg-gray-100 dark:bg-gray-900">
-                                                                                <tr>
-                                                                                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400">
-                                                                                        Produit
-                                                                                    </th>
-                                                                                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400">
-                                                                                        Quantité
-                                                                                    </th>
-                                                                                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400">
-                                                                                        Prix Unitaire
-                                                                                    </th>
-                                                                                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400">
-                                                                                        Total
-                                                                                    </th>
-                                                                                </tr>
-                                                                            </thead>
-                                                                            <tbody className="bg-white divide-y divide-gray-200 dark:bg-gray-800 dark:divide-gray-700">
-                                                                                {panierCommandes
-                                                                                    .filter((pc) => pc.commande_id === commande.id)
-                                                                                    .map((pc) => (
-                                                                                        <React.Fragment key={pc.id}>
-                                                                                            <tr
-                                                                                                onClick={() => handlePanierClick(pc.panier)}
-                                                                                                className="hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer"
-                                                                                            >
-                                                                                                <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                                                                                                    {pc.panier?.name || "N/A"}
+                                {/* Display Selected Panier Articles and Quantity Input */}
+                                {selectedPaniers.length > 0 && (
+                                    <div className="mb-4">
+                                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-400">
+                                            Détails des Paniers
+                                        </label>
+                                        <div className="mt-2">
+                                            <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                                                <thead className="bg-gray-50 dark:bg-gray-900">
+                                                    <tr>
+                                                        <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400">
+                                                            Produit
+                                                        </th>
+                                                        <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400">
+                                                            Prix Unitaire
+                                                        </th>
+                                                        <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400">
+                                                            Quantité
+                                                        </th>
+                                                        <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400">
+                                                            Total
+                                                        </th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody className="bg-white divide-y divide-gray-200 dark:bg-gray-800 dark:divide-gray-700">
+                                                    {paniers
+                                                        .filter((panier) => selectedPaniers.includes(panier.id))
+                                                        .map((panier) => (
+                                                            <React.Fragment key={panier.id}>
+                                                                <tr className="hover:bg-gray-50 dark:hover:bg-gray-700">
+                                                                    <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                                                                        {panier.name}
+                                                                    </td>
+                                                                    <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                                                                        {panier.price} DT
+                                                                    </td>
+                                                                    <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                                                                        <input
+                                                                            type="number"
+                                                                            value={panierQuantities[panier.id] || 1}
+                                                                            onChange={(e) =>
+                                                                                handleQuantityChange(panier.id, parseInt(e.target.value))
+                                                                            }
+                                                                            min="1"
+                                                                            className="w-20 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300"
+                                                                        />
+                                                                    </td>
+                                                                    <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                                                                        {calculatePanierTotal(panier)} DT
+                                                                    </td>
+                                                                </tr>
+                                                                {/* Display Articles for Each Panier */}
+                                                                {panier.articles && panier.articles.length > 0 && (
+                                                                    <tr>
+                                                                        <td colSpan={4} className="px-4 py-2">
+                                                                            <div className="pl-8">
+                                                                                <table className="w-full">
+                                                                                    <thead>
+                                                                                        <tr>
+                                                                                            <th className="text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400">
+                                                                                                Article
+                                                                                            </th>
+                                                                                            <th className="text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400">
+                                                                                                Quantité
+                                                                                            </th>
+                                                                                        </tr>
+                                                                                    </thead>
+                                                                                    <tbody>
+                                                                                        {panier.articles.map((article) => (
+                                                                                            <tr key={article.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
+                                                                                                <td className="px-4 py-2 text-sm text-gray-900 dark:text-gray-100">
+                                                                                                    {article.name}
                                                                                                 </td>
-                                                                                                <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                                                                                                    {pc.quantity}
-                                                                                                </td>
-                                                                                                <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                                                                                                    {(pc.panier?.price || 0).toFixed(2)} DT
-                                                                                                </td>
-                                                                                                <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                                                                                                    {((pc.panier?.price || 0) * pc.quantity).toFixed(2)} DT
+                                                                                                <td className="px-4 py-2 text-sm text-gray-900 dark:text-gray-100">
+                                                                                                    {article.pivot.quantity}
                                                                                                 </td>
                                                                                             </tr>
-                                                                                            {/* Show Articles for Selected Panier */}
-                                                                                            {selectedPanier?.id === pc.panier?.id && (
-                                                                                                <tr>
-                                                                                                    <td colSpan={4} className="px-4 py-2">
-                                                                                                        <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                                                                                                            <thead className="bg-gray-50 dark:bg-gray-900">
-                                                                                                                <tr>
-                                                                                                                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400">
-                                                                                                                        Article
-                                                                                                                    </th>
-                                                                                                                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400">
-                                                                                                                        Quantité
-                                                                                                                    </th>
-                                                                                                                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400">
-                                                                                                                        Ready
-                                                                                                                    </th>
-                                                                                                                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400">
-                                                                                                                        Extra
-                                                                                                                    </th>
-                                                                                                                </tr>
-                                                                                                            </thead>
-                                                                                                            <tbody className="bg-white divide-y divide-gray-200 dark:bg-gray-800 dark:divide-gray-700">
-                                                                                                                {selectedPanier.articles.map((article) => (
-                                                                                                                    <tr key={article.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
-                                                                                                                        <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                                                                                                                            {article.name}
-                                                                                                                        </td>
-                                                                                                                        <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                                                                                                                            {article.pivot.quantity}
-                                                                                                                        </td>
-                                                                                                                        <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                                                                                                                            {/* Add logic for "Ready" column */}
-                                                                                                                            {article.pivot.ready ? "Oui" : "Non"}
-                                                                                                                        </td>
-                                                                                                                        <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                                                                                                                            {/* Add logic for "Extra" column */}
-                                                                                                                            {article.pivot.extra ? "Oui" : "Non"}
-                                                                                                                        </td>
-                                                                                                                    </tr>
-                                                                                                                ))}
-                                                                                                            </tbody>
-                                                                                                        </table>
-                                                                                                    </td>
-                                                                                                </tr>
-                                                                                            )}
-                                                                                        </React.Fragment>
-                                                                                    ))}
-                                                                            </tbody>
-                                                                        </table>
-                                                                    </div>
-
-                                                                    {/* Total Section */}
-                                                                    <div className="flex justify-end">
-                                                                        <div className="w-1/3">
-                                                                            <div className="flex justify-between mb-2">
-                                                                                <p className="text-sm text-gray-600 dark:text-gray-400">Sous-Total:</p>
-                                                                                <p className="text-sm text-gray-900 dark:text-gray-100">
-                                                                                    {calculateTotal(commande.id).toFixed(2)} DT
-                                                                                </p>
+                                                                                        ))}
+                                                                                    </tbody>
+                                                                                </table>
                                                                             </div>
-                                                                            <div className="flex justify-between mb-2">
-                                                                                <p className="text-sm text-gray-600 dark:text-gray-400">Taxes (0%):</p>
-                                                                                <p className="text-sm text-gray-900 dark:text-gray-100">0.00 DT</p>
-                                                                            </div>
-                                                                            <div className="flex justify-between">
-                                                                                <p className="text-lg font-semibold text-gray-900 dark:text-gray-100">Total:</p>
-                                                                                <p className="text-lg font-semibold text-gray-900 dark:text-gray-100">
-                                                                                    {calculateTotal(commande.id).toFixed(2)} DT
-                                                                                </p>
-                                                                            </div>
-                                                                        </div>
-                                                                    </div>
+                                                                        </td>
+                                                                    </tr>
+                                                                )}
+                                                            </React.Fragment>
+                                                        ))}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                )}
 
-                                                                    {/* Footer */}
-                                                                    <div className="mt-6 text-center text-sm text-gray-500 dark:text-gray-400">
-                                                                        <p>Merci pour votre confiance !</p>
-                                                                        <p>Pour toute question, contactez-nous à support@example.com.</p>
-                                                                    </div>
+                                {/* Display Selected Extra Articles and Quantity Input */}
+                                {selectedExtraArticles.length > 0 && (
+                                    <div className="mb-4">
+                                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-400">
+                                            Détails des Articles Supplémentaires
+                                        </label>
+                                        <div className="mt-2">
+                                            <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                                                <thead className="bg-gray-50 dark:bg-gray-900">
+                                                    <tr>
+                                                        <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400">
+                                                            Article
+                                                        </th>
+                                                        <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400">
+                                                            Prix Unitaire
+                                                        </th>
+                                                        <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400">
+                                                            Quantité
+                                                        </th>
+                                                        <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400">
+                                                            Total
+                                                        </th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody className="bg-white divide-y divide-gray-200 dark:bg-gray-800 dark:divide-gray-700">
+                                                    {articles
+                                                        .filter((article) => selectedExtraArticles.includes(article.id))
+                                                        .map((article) => (
+                                                            <tr key={article.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
+                                                                <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                                                                    {article.name}
+                                                                </td>
+                                                                <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                                                                    {article.price} DT
+                                                                </td>
+                                                                <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                                                                    <input
+                                                                        type="number"
+                                                                        value={extraArticleQuantities[article.id] || 1}
+                                                                        onChange={(e) =>
+                                                                            handleExtraArticleQuantityChange(article.id, parseInt(e.target.value))
+                                                                        }
+                                                                        min="1"
+                                                                        className="w-20 rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300"
+                                                                    />
+                                                                </td>
+                                                                <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                                                                    {calculateExtraArticleTotal(article)} DT
+                                                                </td>
+                                                            </tr>
+                                                        ))}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                )}
 
-                                                                    {/* Download PDF Button
-                                                                    {user.role === 'admin' && (
-                                                                        <div className="mt-6 flex justify-end">
-                                                                            <button
-                                                                                onClick={() => downloadCommandePDF(commande)}
-                                                                                className="inline-flex items-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:bg-indigo-500 dark:hover:bg-indigo-400"
-                                                                            >
-                                                                                Télécharger la Commande (PDF)
-                                                                            </button>
-                                                                        </div>
-                                                                    )} */}
-                                                                </div>
-                                                            </td>
-                                                        </motion.tr>
-                                                    )}
-                                                </AnimatePresence>
-                                            </AnimatePresence>
-                                        ))}
-                                    </tbody>
-                                </table>
-                            </div>
-                            {commandes.length === 0 && (
-                                <div className="text-center py-6 text-gray-500 dark:text-gray-400">
-                                    Aucune commande disponible.
+                                {/* Grand Total */}
+                                <div className="mt-4 text-right">
+                                    <p className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                                        Total: {calculateGrandTotal()} DT
+                                    </p>
                                 </div>
-                            )}
+
+                                {/* Submit Button */}
+                                <motion.button
+                                    whileHover={{ scale: 1.05 }}
+                                    whileTap={{ scale: 0.95 }}
+                                    type="submit"
+                                    disabled={processing}
+                                    className="inline-flex items-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:bg-indigo-500 dark:hover:bg-indigo-400"
+                                >
+                                    Ajouter
+                                </motion.button>
+                            </form>
                         </div>
-                    </div>
+                    </motion.div>
                 </div>
-            </div>
+            </motion.div>
         </AuthenticatedLayout>
     );
 };
 
-export default Index;
+export default Add;
