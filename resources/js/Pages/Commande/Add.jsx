@@ -3,17 +3,19 @@ import { Head, useForm } from "@inertiajs/react";
 import { AnimatePresence, motion } from "framer-motion";
 import React, { useState } from "react";
 import toast, { Toaster } from "react-hot-toast";
-import { FaShoppingCart } from "react-icons/fa"; // Import shopping cart icon
+import { FaShoppingCart } from "react-icons/fa";
 import ExtraArticlesSection from "./ExtraArticlesSection";
 import PanierSelectionSection from "./PanierSelectionSection";
 import Cart from "./Cart";
+import { FaBagShopping, FaProductHunt, FaShop } from "react-icons/fa6";
 
 const Add = ({ paniers, articles }) => {
     const [selectedPaniers, setSelectedPaniers] = useState([]);
     const [panierQuantities, setPanierQuantities] = useState({});
     const [selectedExtraArticles, setSelectedExtraArticles] = useState([]);
     const [extraArticleQuantities, setExtraArticleQuantities] = useState({});
-    const [isCartOpen, setIsCartOpen] = useState(false); // State to control cart modal visibility
+    const [isCartOpen, setIsCartOpen] = useState(false);
+    const [animatingItem, setAnimatingItem] = useState(null); // Track the item being animated
 
     const { data, setData, post, errors, processing } = useForm({
         date: "",
@@ -24,9 +26,19 @@ const Add = ({ paniers, articles }) => {
 
     // Handle panier selection
     const handlePanierSelection = (panierId) => {
+        const panier = paniers.find((p) => p.id === panierId);
+        const isDeselecting = selectedPaniers.includes(panierId);
+
+        setAnimatingItem({
+            id: panierId,
+            type: "panier",
+            name: panier.name,
+            direction: isDeselecting ? "reverse" : "forward", // Add direction
+        });
+
         setSelectedPaniers((prev) => {
             let updatedPaniers;
-            if (prev.includes(panierId)) {
+            if (isDeselecting) {
                 updatedPaniers = prev.filter((id) => id !== panierId);
                 const updatedQuantities = { ...panierQuantities };
                 delete updatedQuantities[panierId];
@@ -51,9 +63,19 @@ const Add = ({ paniers, articles }) => {
 
     // Handle extra article selection
     const handleExtraArticleSelection = (articleId) => {
+        const article = articles.find((a) => a.id === articleId);
+        const isDeselecting = selectedExtraArticles.includes(articleId);
+
+        setAnimatingItem({
+            id: articleId,
+            type: "article",
+            name: article.name,
+            direction: isDeselecting ? "reverse" : "forward", // Add direction
+        });
+
         setSelectedExtraArticles((prev) => {
             let updatedArticles;
-            if (prev.includes(articleId)) {
+            if (isDeselecting) {
                 updatedArticles = prev.filter((id) => id !== articleId);
                 const updatedQuantities = { ...extraArticleQuantities };
                 delete updatedQuantities[articleId];
@@ -75,7 +97,6 @@ const Add = ({ paniers, articles }) => {
             return updatedArticles;
         });
     };
-
     // Handle form submission
     const submit = (e) => {
         e.preventDefault();
@@ -106,43 +127,11 @@ const Add = ({ paniers, articles }) => {
             },
         });
     };
-    // Handle quantity change for a panier
-    const handleQuantityChange = (panierId, quantity) => {
-        setPanierQuantities((prevQuantities) => {
-            const updatedQuantities = {
-                ...prevQuantities,
-                [panierId]: quantity,
-            };
 
-            // Update the `data` object with the new quantities
-            const paniersData = selectedPaniers.map((id) => ({
-                panier_id: id,
-                quantity: updatedQuantities[id] || 1,
-            }));
-            setData("paniers", paniersData);
-
-            return updatedQuantities;
-        });
+    // Handle animation completion
+    const handleAnimationComplete = () => {
+        setAnimatingItem(null); // Clear the animating item after the animation is done
     };
-    // Handle quantity change for an extra article
-    const handleExtraArticleQuantityChange = (articleId, quantity) => {
-        setExtraArticleQuantities((prevQuantities) => {
-            const updatedQuantities = {
-                ...prevQuantities,
-                [articleId]: quantity,
-            };
-
-            // Update the `data` object with the new quantities
-            const articlesData = selectedExtraArticles.map((id) => ({
-                article_id: id,
-                quantity: updatedQuantities[id] || 1,
-            }));
-            setData("articles_commandes", articlesData);
-
-            return updatedQuantities;
-        });
-    };
-
     // Calculate total price for a panier
     const calculatePanierTotal = (panier) => {
         const quantity = panierQuantities[panier.id] || 1;
@@ -169,6 +158,42 @@ const Add = ({ paniers, articles }) => {
 
         return paniersTotal + articlesTotal;
     };
+    // Handle quantity change for an extra article
+    const handleExtraArticleQuantityChange = (articleId, quantity) => {
+        setExtraArticleQuantities((prevQuantities) => {
+            const updatedQuantities = {
+                ...prevQuantities,
+                [articleId]: quantity,
+            };
+
+            // Update the `data` object with the new quantities
+            const articlesData = selectedExtraArticles.map((id) => ({
+                article_id: id,
+                quantity: updatedQuantities[id] || 1,
+            }));
+            setData("articles_commandes", articlesData);
+
+            return updatedQuantities;
+        });
+    };
+    // Handle quantity change for a panier
+    const handleQuantityChange = (panierId, quantity) => {
+        setPanierQuantities((prevQuantities) => {
+            const updatedQuantities = {
+                ...prevQuantities,
+                [panierId]: quantity,
+            };
+
+            // Update the `data` object with the new quantities
+            const paniersData = selectedPaniers.map((id) => ({
+                panier_id: id,
+                quantity: updatedQuantities[id] || 1,
+            }));
+            setData("paniers", paniersData);
+
+            return updatedQuantities;
+        });
+    };
     // Calculate total number of selected items
     const totalSelectedItems = selectedPaniers.length + selectedExtraArticles.length;
 
@@ -194,7 +219,7 @@ const Add = ({ paniers, articles }) => {
             <Toaster position="bottom-center" reverseOrder={false} />
 
             {/* Cart Icon with Badge */}
-            <div className="fixed bottom-4 right-4 z-50">
+            <div className="fixed top-20 right-4 z-50">
                 <button
                     onClick={openCart}
                     className="relative p-3 bg-indigo-600 rounded-full text-white hover:bg-indigo-500 focus:outline-none"
@@ -207,8 +232,12 @@ const Add = ({ paniers, articles }) => {
                     )}
                 </button>
             </div>
-            <Cart {
-                ...{
+
+
+
+            {/* Cart Modal */}
+            <Cart
+                {...{
                     paniers,
                     articles,
                     selectedPaniers,
@@ -223,12 +252,40 @@ const Add = ({ paniers, articles }) => {
                     calculateExtraArticleTotal,
                     handleExtraArticleQuantityChange,
                     handleQuantityChange,
-
-                }} />
-
-
-
-
+                }}
+            />
+            {/* Animate Item to Cart */}
+            <AnimatePresence>
+                {animatingItem && (
+                    <motion.div
+                        key={animatingItem.id}
+                        initial={{
+                            opacity: 1,
+                            scale: 1,
+                            position: "fixed",
+                            top: animatingItem.direction === "forward" ? "50%" : "5rem", // Adjust initial position
+                            left: animatingItem.direction === "forward" ? "50%" : "calc(100% - 4rem)", // Adjust initial position
+                            zIndex: 1000,
+                        }}
+                        animate={{
+                            opacity: 0,
+                            scale: 0.5,
+                            top: animatingItem.direction === "forward" ? "5rem" : "50%", // Reverse the animation
+                            left: animatingItem.direction === "forward" ? "calc(100% - 4rem)" : "50%", // Reverse the animation
+                            zIndex: 1000,
+                        }}
+                        exit={{ opacity: 0, scale: 0 }}
+                        transition={{ duration: 1, ease: "easeInOut" }}
+                        onAnimationComplete={handleAnimationComplete}
+                        className="z-50"
+                        style={{ zIndex: 1000 }} // Ensure it's on top
+                    >
+                        <div className=" text-green-500 px-3 py-1 rounded-full text-5xl">
+                            <FaBagShopping />
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
             {/* Main Content */}
             <motion.div
                 initial={{ opacity: 0 }}
@@ -263,12 +320,19 @@ const Add = ({ paniers, articles }) => {
                                 {/* Date and Description Fields */}
                                 <div className="mb-4">
                                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-400">
-                                        Date Prévu
+                                        Date de livraison prévu
                                     </label>
                                     <input
                                         type="date"
                                         value={data.date}
                                         onChange={(e) => setData("date", e.target.value)}
+                                        onBlur={(e) => {
+                                            const selectedDate = new Date(e.target.value);
+                                            const currentDate = new Date();
+                                            if (selectedDate < currentDate) {
+                                                setData("date", currentDate.toISOString().split("T")[0]);
+                                            }
+                                        }}
                                         min={new Date().toISOString().split("T")[0]}
                                         className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300"
                                     />
@@ -277,7 +341,7 @@ const Add = ({ paniers, articles }) => {
 
                                 <div className="mb-4">
                                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-400">
-                                        Description (optionnel)
+                                        Commentaire
                                     </label>
                                     <textarea
                                         value={data.description}

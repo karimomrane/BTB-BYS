@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import './styles.css';
 
 const ExtraArticlesSection = ({ articles, selectedExtraArticles, handleExtraArticleSelection }) => {
     const [showModal, setShowModal] = useState(false);
@@ -47,7 +48,7 @@ const ExtraArticlesSection = ({ articles, selectedExtraArticles, handleExtraArti
                             animate={{ scale: 1, opacity: 1 }}
                             exit={{ scale: 0.8, opacity: 0 }}
                             transition={{ duration: 0.3 }}
-                            className="bg-green-50 dark:bg-gray-800 rounded-lg shadow-lg w-full max-w-4xl p-6 mx-4"
+                            className="bg-green-100 dark:bg-gray-800 rounded-lg shadow-lg w-full max-w-4xl p-6 mx-4"
                             onClick={(e) => e.stopPropagation()} // Prevent modal from closing when clicking inside
                         >
                             <div className="flex justify-between items-center mb-6">
@@ -76,7 +77,7 @@ const ExtraArticlesSection = ({ articles, selectedExtraArticles, handleExtraArti
                             </div>
 
                             {/* Articles Grid */}
-                            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 max-h-[60vh] overflow-y-auto">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 max-h-[60vh] overflow-y-auto custom-scrollbar">
                                 {articles
                                     .filter((article) => article.is_extra)
                                     .map((article) => (
@@ -140,23 +141,7 @@ const ExtraArticlesSection = ({ articles, selectedExtraArticles, handleExtraArti
                 )}
             </AnimatePresence>
 
-            {/* Skeleton Loading Animation CSS */}
-            <style jsx>{`
-                .skeleton-loading {
-                    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
-                    background-size: 200% 100%;
-                    animation: shimmer 1.5s infinite;
-                }
 
-                @keyframes shimmer {
-                    0% {
-                        background-position: -200% 0;
-                    }
-                    100% {
-                        background-position: 200% 0;
-                    }
-                }
-            `}</style>
         </>
     );
 };

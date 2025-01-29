@@ -1,9 +1,9 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, usePage } from '@inertiajs/react';
-import { FaUsers, FaClipboardList, FaTruck, FaChartLine } from 'react-icons/fa';
+import { FaUsers, FaClipboardList, FaTruck, FaChartLine, FaMoneyBill } from 'react-icons/fa';
 import { motion } from 'framer-motion';
 
-export default function Dashboard({ totalRevenue, totalRevenuePrevu, comliv, uc, users, commandes }) {
+export default function Dashboard({ totalRevenue, totalRevenuePrevu, comliv, uc, users, commandes,compay }) {
     const user = usePage().props.auth.user;
 
     // Animation variants for cards
@@ -84,9 +84,9 @@ export default function Dashboard({ totalRevenue, totalRevenuePrevu, comliv, uc,
                     className="flex items-center rounded-lg bg-white p-6 shadow-lg dark:bg-gray-800"
                     variants={cardVariants}
                 >
-                    <div className="mr-4 flex items-center justify-center h-12 w-12 rounded-full bg-green-100 dark:bg-green-900">
+                    <div className="mr-4 flex items-center justify-center h-12 w-12 rounded-full bg-yellow-100 dark:bg-yellow-900">
                         <FaTruck
-                            className="text-green-500 dark:text-green-400"
+                            className="text-yellow-500 dark:text-yellow-400"
                             aria-label="Orders Icon"
                         />
                     </div>
@@ -136,6 +136,26 @@ export default function Dashboard({ totalRevenue, totalRevenuePrevu, comliv, uc,
                         </h3>
                         <p className="text-gray-600 dark:text-gray-400">
                             {totalRevenue + totalRevenuePrevu} DT
+                        </p>
+                    </div>
+                </motion.div>
+
+                <motion.div
+                    className="flex items-center rounded-lg bg-white p-6 shadow-lg dark:bg-gray-800"
+                    variants={cardVariants}
+                >
+                    <div className="mr-4 flex items-center justify-center h-12 w-12 rounded-full bg-green-100 dark:bg-green-900">
+                        <FaMoneyBill
+                            className="text-green-500 dark:text-green-400"
+                            aria-label="Orders Icon"
+                        />
+                    </div>
+                    <div>
+                        <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200">
+                            Commandes Payé
+                        </h3>
+                        <p className="text-gray-600 dark:text-gray-400">
+                            {compay ? compay : 0}
                         </p>
                     </div>
                 </motion.div>

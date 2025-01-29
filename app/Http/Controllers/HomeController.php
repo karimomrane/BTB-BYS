@@ -17,6 +17,7 @@ class HomeController extends Controller
             $commandes = Commande::count();
             $users = User::count();
             $comliv = Commande::where('status', 'Livré')->count();
+            $compay = Commande::where('status', 'Payé')->count();
 
             // Calculate total revenue for orders with status = Payé
             $totalRevenue = Commande::where('status', 'Payé')
@@ -112,6 +113,7 @@ class HomeController extends Controller
                 'uc' => $uc,
                 'totalRevenue' => $totalRevenue, // Pass total revenue to the frontend
                 'totalRevenuePrevu' => $totalRevenuePrevu,
+                'compay' => $compay
             ]);
         } else {
             return to_route('commandes.create');
