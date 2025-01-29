@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\JustTesting;
 use App\Models\Article;
 use App\Models\Articles_Commande;
 use App\Models\Commande;
@@ -10,6 +11,7 @@ use App\Models\Panier_Commande;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 use Inertia\Inertia;
 
 class CommandeController extends Controller
@@ -160,6 +162,9 @@ class CommandeController extends Controller
             'status' => $validated['status'],
             'description' => $request->description,
         ]);
+
+        // Send Email Notification
+        Mail::to($commande->user->email)->send(new JustTesting($commande));
 
         return to_route('commandes.index');
     }
