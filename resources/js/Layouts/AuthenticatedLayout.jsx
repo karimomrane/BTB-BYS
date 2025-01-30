@@ -6,6 +6,7 @@ import { Link, usePage } from '@inertiajs/react';
 import { useState } from 'react';
 import { motion } from "motion/react"
 import Navbar from './Navbar';
+import './styles.css';
 
 export default function AuthenticatedLayout({ header, children }) {
     const user = usePage().props.auth.user;
@@ -14,9 +15,8 @@ export default function AuthenticatedLayout({ header, children }) {
         useState(false);
 
     return (
-
-        <div className="min-h-screen bg-gray-100 dark:bg-gray-900">
-            <Navbar/>
+        <div className="min-h-screen bg-gray-100 dark:bg-gray-900 wave-background">
+            <Navbar />
 
             {header && (
                 <header className="bg-white shadow dark:bg-gray-800">
@@ -26,7 +26,7 @@ export default function AuthenticatedLayout({ header, children }) {
                             animate={{ y: 0, opacity: 1 }}
                             transition={{ duration: 0.5 }}
                         >
-                        {header}
+                            {header}
                         </motion.span>
                     </div>
                 </header>
@@ -41,7 +41,6 @@ export default function AuthenticatedLayout({ header, children }) {
                 >
                     {children}
                 </motion.div>
-
             </main>
         </div>
     );
