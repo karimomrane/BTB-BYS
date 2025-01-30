@@ -27,3 +27,9 @@
     scrollbar-color: #7BBA27 transparent;
     /* Green handle with transparent track in dark mode */
 }
+
+@media (max-width: 640px) {
+    .hovered-articles-list {
+        display:none;
+    }
+}

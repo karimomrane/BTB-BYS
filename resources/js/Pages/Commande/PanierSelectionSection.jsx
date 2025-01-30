@@ -1,9 +1,13 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import './styles.css';
+import { FaCheck } from "react-icons/fa";
+
 const PanierSelectionSection = ({ paniers, selectedPaniers, handlePanierSelection }) => {
     const [showModal, setShowModal] = useState(false);
-    const [loadedImages, setLoadedImages] = useState({}); // Track loaded images
+    const [hoveredPanier, setHoveredPanier] = useState(null);
+    const [loadedImages, setLoadedImages] = useState({});
+    const [cursorPos, setCursorPos] = useState({ x: 0, y: 0 });
 
     // Handle image load
     const handleImageLoad = (id) => {
@@ -18,7 +22,7 @@ const PanierSelectionSection = ({ paniers, selectedPaniers, handlePanierSelectio
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ duration: 0.5 }}
                 className="relative overflow-hidden bg-cover bg-center h-24 rounded-lg mb-8"
-                style={{ backgroundImage: 'url(/cmdd.jpg)' }} // Replace with your image path
+                style={{ backgroundImage: 'url(/cmdd.jpg)' }}
             >
                 <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center p-6">
                     <button
@@ -40,7 +44,7 @@ const PanierSelectionSection = ({ paniers, selectedPaniers, handlePanierSelectio
                         exit={{ opacity: 0 }}
                         transition={{ duration: 0.3 }}
                         className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
-                        onClick={() => setShowModal(false)} // Close modal on outside click
+                        onClick={() => setShowModal(false)}
                     >
                         <motion.div
                             initial={{ scale: 0.8, opacity: 0 }}
@@ -48,7 +52,7 @@ const PanierSelectionSection = ({ paniers, selectedPaniers, handlePanierSelectio
                             exit={{ scale: 0.8, opacity: 0 }}
                             transition={{ duration: 0.3 }}
                             className="bg-gray-100 dark:bg-gray-800 rounded-lg shadow-lg w-full max-w-4xl p-7 mx-4"
-                            onClick={(e) => e.stopPropagation()} // Prevent modal from closing when clicking inside
+                            onClick={(e) => e.stopPropagation()}
                         >
                             <div className="flex justify-between items-center mb-6">
                                 <h2 className="text-xl font-semibold text-indigo-600 dark:text-indigo-400">
@@ -83,52 +87,57 @@ const PanierSelectionSection = ({ paniers, selectedPaniers, handlePanierSelectio
                                         initial={{ scale: 0.9, opacity: 0 }}
                                         animate={{ scale: 1, opacity: 1 }}
                                         transition={{ duration: 0.3, delay: 0.1 }}
-                                        className="bg-white h-[22rem] dark:bg-gray-700 rounded-lg shadow-sm hover:shadow-md transition-shadow overflow-hidden"
+                                        className={`relative bg-white h-[22rem] dark:bg-gray-700 rounded-lg shadow-sm hover:shadow-md transition-shadow overflow-hidden p-4 border-2 z-10 ${
+                                            selectedPaniers.includes(panier.id)
+                                                ? "border-green-500"
+                                                : "border-transparent"
+                                        }`}
+                                        onMouseEnter={(e) => {
+                                            setHoveredPanier(panier.id);
+                                            setCursorPos({ x: e.clientX, y: e.clientY });
+                                        }}
+                                        onMouseMove={(e) => setCursorPos({ x: e.clientX, y: e.clientY })}
+                                        onMouseLeave={() => setHoveredPanier(null)}
+                                        onClick={() => handlePanierSelection(panier.id)}
                                     >
-                                        <label htmlFor={`panier-${panier.id}`}>
-                                            {/* Panier Image with Skeleton Loading */}
-                                            <div className="relative h-40 w-full">
-                                                {!loadedImages[panier.id] && (
-                                                    <div className="skeleton-loading absolute inset-0 bg-gray-300 dark:bg-gray-600 animate-pulse"></div>
-                                                )}
-                                                <img
-                                                    src={`/storage/${panier.image}`} // Replace with your panier image field
-                                                    alt={panier.name}
-                                                    className={`w-full h-full object-cover ${!loadedImages[panier.id] ? "opacity-0" : "opacity-100"}`}
-                                                    loading="lazy"
-                                                    onLoad={() => handleImageLoad(panier.id)}
-                                                />
-                                            </div>
-                                        </label>
+                                        {/* Selection Checkmark */}
+                                        {selectedPaniers.includes(panier.id) && (
+                                            <motion.div
+                                                initial={{ opacity: 0, scale: 0.5 }}
+                                                animate={{ opacity: 1, scale: 1 }}
+                                                transition={{ duration: 0.3 }}
+                                                className="absolute top-2 right-2 bg-green-500 text-white rounded-full p-2 z-10"
+                                            >
+                                                <FaCheck size={16} />
+                                            </motion.div>
+                                        )}
+
+                                        {/* Panier Image */}
+                                        <div className="relative h-40 w-full mb-4">
+                                            {!loadedImages[panier.id] && (
+                                                <div className="skeleton-loading absolute inset-0 bg-gray-300 dark:bg-gray-600 animate-pulse"></div>
+                                            )}
+                                            <img
+                                                src={`/storage/${panier.image}`}
+                                                alt={panier.name}
+                                                className={`w-full h-full object-cover rounded-md ${
+                                                    !loadedImages[panier.id] ? "opacity-0" : "opacity-100"
+                                                }`}
+                                                loading="lazy"
+                                                onLoad={() => handleImageLoad(panier.id)}
+                                            />
+                                        </div>
 
                                         {/* Panier Details */}
-                                        <div className="p-4">
-                                            <h3 className="text-lg font-semibold text-indigo-600 dark:text-indigo-400">
-                                                {panier.name}
-                                            </h3>
-                                            <p className="text-sm text-gray-600 dark:text-gray-300 mt-2">
-                                                {panier.description} {/* Add a description field if available */}
-                                            </p>
-                                            <p className="text-sm text-gray-600 dark:text-gray-300 mt-2">
-                                                Prix: {panier.price} DT
-                                            </p>
-                                        </div>
-
-                                        {/* Selection Checkbox */}
-                                        <div className="p-4 border-t border-gray-200 dark:border-gray-600">
-                                            <label className="flex items-center space-x-2">
-                                                <input
-                                                    id={`panier-${panier.id}`}
-                                                    type="checkbox"
-                                                    checked={selectedPaniers.includes(panier.id)}
-                                                    onChange={() => handlePanierSelection(panier.id)}
-                                                    className="form-checkbox h-5 w-5 text-indigo-600 rounded focus:ring-indigo-500 dark:focus:ring-indigo-400"
-                                                />
-                                                <span className="text-sm text-gray-600 dark:text-gray-300">
-                                                    Sélectionner
-                                                </span>
-                                            </label>
-                                        </div>
+                                        <h3 className="text-lg font-semibold text-indigo-600 dark:text-indigo-400">
+                                            {panier.name}
+                                        </h3>
+                                        <p className="text-sm text-gray-600 dark:text-gray-300 mt-2">
+                                            {panier.description}
+                                        </p>
+                                        <p className="text-sm text-gray-600 dark:text-gray-300 mt-2">
+                                            Prix: {panier.price} DT
+                                        </p>
                                     </motion.div>
                                 ))}
                             </div>
@@ -137,7 +146,32 @@ const PanierSelectionSection = ({ paniers, selectedPaniers, handlePanierSelectio
                 )}
             </AnimatePresence>
 
-
+            {/* Floating Articles List */}
+            <AnimatePresence>
+                {hoveredPanier && (
+                    <motion.div
+                        initial={{ opacity: 0, scale: 0.8 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.8 }}
+                        transition={{ duration: 0.3 }}
+                        style={{
+                            position: "fixed",
+                            top: cursorPos.y + 20,
+                            left: cursorPos.x + 20,
+                            minWidth: "200px",
+                        }}
+                        className="hovered-articles-list bg-black bg-opacity-80 text-white p-4 rounded-md shadow-lg z-50"
+                    >
+                        <ul className="text-sm">
+                            {paniers.find((p) => p.id === hoveredPanier)?.articles.map((article, index) => (
+                                <li key={index}>
+                                    <strong>{index + 1}.</strong> {article.name}
+                                </li>
+                            )) || <li>Aucun article</li>}
+                        </ul>
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </>
     );
 };

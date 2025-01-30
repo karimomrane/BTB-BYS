@@ -86,24 +86,25 @@ const ExtraArticlesSection = ({ articles, selectedExtraArticles, handleExtraArti
                                             initial={{ scale: 0.9, opacity: 0 }}
                                             animate={{ scale: 1, opacity: 1 }}
                                             transition={{ duration: 0.3, delay: 0.1 }}
-                                            className="bg-gray-50 dark:bg-gray-700 rounded-lg shadow-sm hover:shadow-md transition-shadow overflow-hidden flex flex-col"
+                                            className={`bg-gray-50 dark:bg-gray-700 rounded-lg shadow-sm hover:shadow-md transition-shadow overflow-hidden flex flex-col relative ${
+                                                selectedExtraArticles.includes(article.id) ? "border-2 border-green-500" : "border-transparent"
+                                            }`}
                                             style={{ minHeight: "300px" }} // Fixed height for consistency
+                                            onClick={() => handleExtraArticleSelection(article.id)} // Handle selection on click
                                         >
-                                            <label htmlFor={`extra-${article.id}`}>
-                                                {/* Article Image with Skeleton Loading */}
-                                                <div className="relative h-40 w-full flex-shrink-0">
-                                                    {!loadedImages[article.id] && (
-                                                        <div className="skeleton-loading absolute inset-0 bg-gray-300 dark:bg-gray-600 animate-pulse"></div>
-                                                    )}
-                                                    <img
-                                                        src={`/storage/${article.image}`} // Replace with your article image field
-                                                        alt={article.name}
-                                                        className={`w-full h-full object-cover ${!loadedImages[article.id] ? "opacity-0" : "opacity-100"}`}
-                                                        loading="lazy"
-                                                        onLoad={() => handleImageLoad(article.id)}
-                                                    />
-                                                </div>
-                                            </label>
+                                            {/* Article Image with Skeleton Loading */}
+                                            <div className="relative h-40 w-full flex-shrink-0">
+                                                {!loadedImages[article.id] && (
+                                                    <div className="skeleton-loading absolute inset-0 bg-gray-300 dark:bg-gray-600 animate-pulse"></div>
+                                                )}
+                                                <img
+                                                    src={`/storage/${article.image}`} // Replace with your article image field
+                                                    alt={article.name}
+                                                    className={`w-full h-full object-cover ${!loadedImages[article.id] ? "opacity-0" : "opacity-100"}`}
+                                                    loading="lazy"
+                                                    onLoad={() => handleImageLoad(article.id)}
+                                                />
+                                            </div>
 
                                             {/* Article Details */}
                                             <div className="p-4 flex flex-col flex-grow">
@@ -118,21 +119,30 @@ const ExtraArticlesSection = ({ articles, selectedExtraArticles, handleExtraArti
                                                 </p>
                                             </div>
 
-                                            {/* Selection Checkbox */}
-                                            <div className="p-4 border-t border-gray-200 dark:border-gray-600 flex-shrink-0">
-                                                <label className="flex items-center space-x-2">
-                                                    <input
-                                                        id={`extra-${article.id}`}
-                                                        type="checkbox"
-                                                        checked={selectedExtraArticles.includes(article.id)}
-                                                        onChange={() => handleExtraArticleSelection(article.id)}
-                                                        className="form-checkbox h-5 w-5 text-[#7BBA27] rounded focus:ring-[#7BBA27] dark:focus:ring-[#7BBA27]"
-                                                    />
-                                                    <span className="text-sm text-gray-600 dark:text-gray-300">
-                                                        Sélectionner
-                                                    </span>
-                                                </label>
-                                            </div>
+                                            {/* Green Checkmark */}
+                                            {selectedExtraArticles.includes(article.id) && (
+                                                <motion.div
+                                                    initial={{ scale: 0 }}
+                                                    animate={{ scale: 1 }}
+                                                    transition={{ duration: 0.3 }}
+                                                    className="absolute top-2 right-2 bg-green-500 rounded-full p-1"
+                                                >
+                                                    <svg
+                                                        xmlns="http://www.w3.org/2000/svg"
+                                                        className="h-6 w-6 text-white"
+                                                        fill="none"
+                                                        viewBox="0 0 24 24"
+                                                        stroke="currentColor"
+                                                    >
+                                                        <path
+                                                            strokeLinecap="round"
+                                                            strokeLinejoin="round"
+                                                            strokeWidth={2}
+                                                            d="M5 13l4 4L19 7"
+                                                        />
+                                                    </svg>
+                                                </motion.div>
+                                            )}
                                         </motion.div>
                                     ))}
                             </div>
@@ -140,8 +150,6 @@ const ExtraArticlesSection = ({ articles, selectedExtraArticles, handleExtraArti
                     </motion.div>
                 )}
             </AnimatePresence>
-
-
         </>
     );
 };
