@@ -15,7 +15,7 @@ class ArticlePanierController extends Controller
      */
     public function create()
     {
-        $paniers = Panier::all(); // Fetch all paniers
+        $paniers = Panier::with('articles')->get(); // Fetch all paniers
         $articles = Article::all(); // Fetch all articles
 
         return Inertia::render('ArticlePaniers/Create', [

@@ -1,7 +1,7 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Head, Link, useForm } from "@inertiajs/react";
 import { Toaster, toast } from "react-hot-toast";
-import { useEffect, useState } from "react"; // Import useState
+import { useEffect, useState } from "react";
 import InputError from "@/Components/InputError";
 
 const Create = ({ articles, paniers }) => {
@@ -10,16 +10,31 @@ const Create = ({ articles, paniers }) => {
         articles: [],
     });
 
-    const [searchQuery, setSearchQuery] = useState(""); // State for search query
+    const [searchQuery, setSearchQuery] = useState("");
 
     // Filter articles based on search query
     const filteredArticles = articles.filter((article) =>
         article.name.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
+    // Determine the selected panier and its associated article IDs (if any)
+    const selectedPanier = paniers.find((panier) => String(panier.id) === data.panier_id);
+
+    const associatedArticleIds = selectedPanier?.articles
+        ? selectedPanier.articles.map((article) => article.id)
+        : [];
+
+    console.log(associatedArticleIds);
+
+
     const handleArticleChange = (articleId, checked) => {
         if (checked) {
-            // Add the article to the selected articles with default values
+            // Add the article only if it's not already associated with the selected panier.
+            if (associatedArticleIds.includes(articleId)) {
+                // Optionally, you can show a toast or message here.
+                toast.error("Cet article est déjà associé à ce panier.");
+                return;
+            }
             setData("articles", [
                 ...data.articles,
                 { id: articleId, ready: false, extra: false, quantity: 1 },
@@ -43,7 +58,6 @@ const Create = ({ articles, paniers }) => {
     const handleSubmit = (e) => {
         e.preventDefault();
 
-        // Use FormData to handle file uploads
         const formData = new FormData();
         formData.append("panier_id", data.panier_id);
         data.articles.forEach((article, index) => {
@@ -59,7 +73,7 @@ const Create = ({ articles, paniers }) => {
                 reset();
             },
             onError: (errors) => {
-                console.error("Validation Errors:", errors); // Log validation errors
+                console.error("Validation Errors:", errors);
                 toast.error("Une erreur s'est produite lors de la validation.");
             },
         });
@@ -86,9 +100,11 @@ const Create = ({ articles, paniers }) => {
                                     </label>
                                     <select
                                         value={data.panier_id}
-                                        onChange={(e) =>
-                                            setData("panier_id", e.target.value)
-                                        }
+                                        onChange={(e) => {
+                                            setData("panier_id", e.target.value);
+                                            // Optionally, clear selected articles when changing the panier
+                                            setData("articles", []);
+                                        }}
                                         className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100"
                                     >
                                         <option value="">Sélectionner un panier</option>
@@ -114,106 +130,65 @@ const Create = ({ articles, paniers }) => {
                                     />
                                 </div>
 
-                                <div>
+                                <div className="h-[400px] overflow-y-auto">
                                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                                         Articles
                                     </label>
                                     <div className="mt-1 space-y-2">
-                                        {filteredArticles.map((article) => (
-                                            <div
-                                                key={article.id}
-                                                className="flex items-center justify-between p-2 border rounded-lg dark:border-gray-600"
-                                            >
-                                                <div className="flex items-center space-x-4">
-                                                    <input
-                                                        type="checkbox"
-                                                        checked={data.articles.some(
-                                                            (a) => a.id === article.id
-                                                        )}
-                                                        onChange={(e) =>
-                                                            handleArticleChange(
-                                                                article.id,
-                                                                e.target.checked
-                                                            )
-                                                        }
-                                                        className="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600"
-                                                    />
-                                                    <span className="text-sm text-gray-700 dark:text-gray-300">
-                                                        {article.name}
-                                                    </span>
-                                                    <input
-                                                        type="number"
-                                                        min="1"
-                                                        value={
-                                                            data.articles.find((a) => a.id === article.id)?.quantity || 1
-                                                        }
-                                                        onChange={(e) =>
-                                                            handleQuantityChange(article.id, e.target.value)
-                                                        }
-                                                        className="w-16 rounded border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100"
-                                                    />
+                                        {filteredArticles.map((article) => {
+                                            const isChecked = data.articles.some((a) => a.id === article.id);
+                                            // Determine if the article should be disabled because it's already associated.
+                                            const isDisabled = associatedArticleIds.includes(article.id);
+
+                                            return (
+                                                <div
+                                                    key={article.id}
+                                                    className="flex items-center justify-between p-2 border rounded-lg dark:border-gray-600"
+                                                >
+                                                    {/* Wrap checkbox and text inside a label */}
+                                                    <label
+                                                        className={`flex items-center space-x-4 cursor-pointer ${isDisabled && "opacity-50 cursor-not-allowed"
+                                                            }`}
+                                                    >
+                                                        <input
+                                                            type="checkbox"
+                                                            checked={isChecked}
+                                                            disabled={isDisabled}
+                                                            onChange={(e) =>
+                                                                handleArticleChange(article.id, e.target.checked)
+                                                            }
+                                                            className="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600"
+                                                        />
+                                                        <span className="text-sm text-gray-700 dark:text-gray-300">
+                                                            {article.name}
+                                                        </span>
+                                                    </label>
+
+                                                    {/* Show number input only if checkbox is checked */}
+                                                    {isChecked && (
+                                                        <input
+                                                            type="number"
+                                                            min="1"
+                                                            value={
+                                                                data.articles.find((a) => a.id === article.id)
+                                                                    ?.quantity || 1
+                                                            }
+                                                            onChange={(e) =>
+                                                                handleQuantityChange(
+                                                                    article.id,
+                                                                    e.target.value
+                                                                )
+                                                            }
+                                                            className="w-16 rounded border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 text-right"
+                                                        />
+                                                    )}
                                                 </div>
-                                                {data.articles.some((a) => a.id === article.id) && (
-                                                    <div className="flex items-center space-x-4">
-                                                        <label className="flex items-center space-x-2">
-                                                            <input
-                                                                type="checkbox"
-                                                                checked={
-                                                                    data.articles.find(
-                                                                        (a) => a.id === article.id
-                                                                    )?.ready || false
-                                                                }
-                                                                onChange={(e) => {
-                                                                    const updatedArticles = data.articles.map(
-                                                                        (a) =>
-                                                                            a.id === article.id
-                                                                                ? {
-                                                                                    ...a,
-                                                                                    ready: e.target.checked,
-                                                                                }
-                                                                                : a
-                                                                    );
-                                                                    setData("articles", updatedArticles);
-                                                                }}
-                                                                className="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600"
-                                                            />
-                                                            <span className="text-sm text-gray-700 dark:text-gray-300">
-                                                                Prêt
-                                                            </span>
-                                                        </label>
-                                                        <label className="flex items-center space-x-2">
-                                                            <input
-                                                                type="checkbox"
-                                                                checked={
-                                                                    data.articles.find(
-                                                                        (a) => a.id === article.id
-                                                                    )?.extra || false
-                                                                }
-                                                                onChange={(e) => {
-                                                                    const updatedArticles = data.articles.map(
-                                                                        (a) =>
-                                                                            a.id === article.id
-                                                                                ? {
-                                                                                    ...a,
-                                                                                    extra: e.target.checked,
-                                                                                }
-                                                                                : a
-                                                                    );
-                                                                    setData("articles", updatedArticles);
-                                                                }}
-                                                                className="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600"
-                                                            />
-                                                            <span className="text-sm text-gray-700 dark:text-gray-300">
-                                                                Extra
-                                                            </span>
-                                                        </label>
-                                                    </div>
-                                                )}
-                                            </div>
-                                        ))}
+                                            );
+                                        })}
                                     </div>
                                     <InputError message={errors.articles} className="mt-2" />
                                 </div>
+
 
                                 <div className="flex justify-end">
                                     <Link
