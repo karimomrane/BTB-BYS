@@ -7,16 +7,16 @@ import TextInput from '@/Components/TextInput';
 import GuestLayout from '@/Layouts/GuestLayout';
 import { Head, Link, useForm } from '@inertiajs/react';
 
-export default function Login({ status, canResetPassword }) {
+export default function Login({ status, canResetPassword, captchaQuestion }) {
     const { data, setData, post, processing, errors, reset } = useForm({
         email: '',
         password: '',
         remember: false,
+        captcha: '',
     });
 
     const submit = (e) => {
         e.preventDefault();
-
         post(route('login'), {
             onFinish: () => reset('password'),
         });
@@ -25,7 +25,6 @@ export default function Login({ status, canResetPassword }) {
     return (
         <GuestLayout>
             <Head title="Log in" />
-
 
             <motion.div
                 className="w-full max-w-md px-6 py-8 bg-white rounded-lg shadow-lg dark:bg-gray-800"
@@ -115,6 +114,7 @@ export default function Login({ status, canResetPassword }) {
                             />
                             <span className="ml-2">Se souvenir de moi</span>
                         </label>
+
                         {canResetPassword && (
                             <Link
                                 href={route('password.request')}
@@ -125,10 +125,30 @@ export default function Login({ status, canResetPassword }) {
                         )}
                     </motion.div>
 
+                    {/* CAPTCHA Section */}
+                    <motion.div
+                        className="mb-4 flex items-center space-x-10 bg-gray-100 dark:bg-gray-700 p-2 rounded-lg shadow-sm"
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ duration: 0.5 }}
+                    >
+                        <InputLabel htmlFor="captcha" value={`Solve: ${captchaQuestion}`} className="text-gray-700 dark:text-gray-300 font-semibold text-xl" />
+                        <TextInput
+                            id="captcha"
+                            type="number"
+                            name="captcha"
+                            value={data.captcha}
+                            className="border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 rounded-md w-20 text-center"
+                            onChange={(e) => setData('captcha', e.target.value)}
+                        />
+
+                    </motion.div>
+                    <InputError message={errors.captcha} className="mb-2" />
+
                     <motion.div
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
-                        transition={{ delay: 0.7, duration: 0.6 }}
+                        transition={{ delay: 0.8, duration: 0.6 }}
                     >
                         <PrimaryButton
                             className="w-full py-2 rounded-lg flex items-center justify-center bg-indigo-600 text-white hover:bg-indigo-700 disabled:bg-indigo-400"

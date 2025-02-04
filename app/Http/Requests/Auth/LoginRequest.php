@@ -29,8 +29,10 @@ class LoginRequest extends FormRequest
         return [
             'email' => ['required', 'string', 'email'],
             'password' => ['required', 'string'],
+            'captcha' => ['required', 'integer'], // Ensure CAPTCHA is a number
         ];
     }
+
 
     /**
      * Attempt to authenticate the request's credentials.
@@ -38,19 +40,28 @@ class LoginRequest extends FormRequest
      * @throws \Illuminate\Validation\ValidationException
      */
     public function authenticate(): void
-    {
-        $this->ensureIsNotRateLimited();
+{
+    $this->ensureIsNotRateLimited();
 
-        if (! Auth::attempt($this->only('email', 'password'), $this->boolean('remember'))) {
-            RateLimiter::hit($this->throttleKey());
-
-            throw ValidationException::withMessages([
-                'email' => trans('auth.failed'),
-            ]);
-        }
-
-        RateLimiter::clear($this->throttleKey());
+    // Validate CAPTCHA
+    if ($this->input('captcha') != session('captcha_answer')) {
+        throw ValidationException::withMessages([
+            'captcha' => 'Incorrect CAPTCHA. Please try again.',
+        ]);
     }
+
+    // Attempt authentication
+    if (!Auth::attempt($this->only('email', 'password'), $this->boolean('remember'))) {
+        RateLimiter::hit($this->throttleKey());
+
+        throw ValidationException::withMessages([
+            'email' => trans('auth.failed'),
+        ]);
+    }
+
+    RateLimiter::clear($this->throttleKey());
+}
+
 
     /**
      * Ensure the login request is not rate limited.
